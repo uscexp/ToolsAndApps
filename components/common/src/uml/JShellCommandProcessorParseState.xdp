@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<pattern id="state">
+ <role name="Context">
+  <member name="ParseContext" package="haui.tool.shell.engine.parsestate" project="common"/>
+ </role>
+ <role name="State">
+  <member name="ParseState" package="haui.tool.shell.engine.parsestate" project="common"/>
+ </role>
+ <role name="ConcreteState">
+  <member name="PureArgState" package="haui.tool.shell.engine.parsestate" project="common"/>
+  <member name="OptKeyState" package="haui.tool.shell.engine.parsestate" project="common"/>
+  <member name="OptValState" package="haui.tool.shell.engine.parsestate" project="common"/>
+  <member name="NoneState" package="haui.tool.shell.engine.parsestate" project="common"/>
+  <member name="CommandState" package="haui.tool.shell.engine.parsestate" project="common"/>
+ </role>
+</pattern>

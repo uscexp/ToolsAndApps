@@ -1,0 +1,7 @@
+#HttpTunnelClientServer connection mapping properties
+#Wed Oct 01 13:59:12 CEST 2003
+Map4=localhost\:119;puce.geeks.org\:119;true;false;true
+Map3=localhost\:25;mail.web.de\:25;true;false;true
+Map2=localhost\:143;imap.web.de\:143;true;false;true
+Map1=localhost\:8000;193.158.119.90\:3128;false;false;true
+Map0=localhost\:23;sdf.lonestar.org\:23;true;false;true

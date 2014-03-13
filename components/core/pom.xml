@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+	<parent>
+		<groupId>haui</groupId>
+		<artifactId>haui</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+    <artifactId>core</artifactId>
+    <name>core</name>
+	<groupId>haui</groupId>
+    <description>core classes</description>
+</project>

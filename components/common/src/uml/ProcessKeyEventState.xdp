@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<pattern id="state">
+ <role name="Context">
+  <member name="Context" package="haui.components.shelltextarea" project="common"/>
+ </role>
+ <role name="State">
+  <member name="State" package="haui.components.shelltextarea" project="common"/>
+ </role>
+ <role name="ConcreteState">
+  <member name="NormalInputState" package="haui.components.shelltextarea" project="common"/>
+  <member name="PwdInputState" package="haui.components.shelltextarea" project="common"/>
+  <member name="PICorrectState" package="haui.components.shelltextarea" project="common"/>
+  <member name="NICorrectState" package="haui.components.shelltextarea" project="common"/>
+  <member name="InteractiveInputState" package="haui.components.shelltextarea" project="common"/>
+  <member name="InteractivePwdInputState" package="haui.components.shelltextarea" project="common"/>
+ </role>
+</pattern>

@@ -1,0 +1,256 @@
+// Simple Programming Language Shell: Method aliases
+
+// --------------------------------
+// file helper functions
+// --------------------------------
+
+//method openFile  // filereader openFile(string filepath)
+//{
+//  type = "java.io.FileReader";
+//  realMethod = "constructor";  // call constructor in this case
+//  static = false;
+//  realParams = { "string" };
+//  returnType = "filereader";
+//}
+
+method openFileToRead  // filereader openFileToRead(string) aliasname to be used in SplShell
+{
+  type = "haui.app.splshell.util.HelperMethods";
+  realMethod = "createBufferedReader";  // method name in real object (java.lang.String)
+  static = true;
+  realParams = { "string" };
+  returnType = "filereader";
+}
+
+method openFileToWrite  // filereader openFileToWrite(string filepath,boolean append)
+{
+  type = "haui.app.splshell.util.HelperMethods";
+  realMethod = "createBufferedWriter";
+  static = true;
+  realParams = { "string", "boolean" };
+  returnType = "filewriter";
+}
+
+method readLine  // string readLine( filereader)
+{
+  type = "haui.app.splshell.util.HelperMethods";
+  realMethod = "readLine";
+  static = true;
+  realParams = { "filereader" };
+  returnType = "string";
+}
+
+method writeString  // void writeString( filewriter, string)
+{
+  type = "java.io.BufferedWriter";
+  realMethod = "write";
+  static = false;
+  realParams = { "string" };
+  returnType = "void";
+}
+
+method isEOF  // string isEOF()
+{
+  type = "haui.app.splshell.util.HelperMethods";
+  realMethod = "isEOF";
+  static = true;
+  realParams = {};
+  returnType = "string";
+}
+
+method isCharEOF  // string isCharEOF()
+{
+  type = "haui.app.splshell.util.HelperMethods";
+  realMethod = "isCharEOF";
+  static = true;
+  realParams = {};
+  returnType = "char";
+}
+
+method readChar  // string readChar( filereader)
+{
+  type = "java.io.BufferedReader";
+  realMethod = "read";
+  static = false;
+  realParams = {};
+  returnType = "char";
+}
+
+method closeFileReader  // void closeFileReader(filereader)
+{
+  type = "java.io.BufferedReader";
+  realMethod = "close";
+  static = false;
+  realParams = { };
+  returnType = "void";
+}
+
+method closeFileWriter  // void closeFileWriter(filewriter)
+{
+  type = "java.io.BufferedWriter";
+  realMethod = "close";
+  static = false;
+  realParams = { };
+  returnType = "void";
+}
+
+// end file helper functions
+
+method arrayLength  // int arrayLength(array)
+{
+  type = "haui.app.splshell.util.HelperMethods";
+  realMethod = "arrayLength";
+  static = true;
+  realParams = { "array" };
+  returnType = "int";
+}
+
+// --------------------------------
+// string helper functions
+// --------------------------------
+
+method substr  // string substr(string,int,int)
+{
+  type = "java.lang.String";
+  realMethod = "substring";  // method name in real object (java.lang.String)
+  static = false;
+  realParams = { "int", "int" };
+  returnType = "string";
+}
+
+method strlen  // int strlen(string)
+{
+  type = "java.lang.String";
+  realMethod = "length";
+  static = false;
+  realParams = { };
+  returnType = "int";
+}
+
+method charArray  // char[] charArray(string)
+{
+  type = "java.lang.String";
+  realMethod = "toCharArray";
+  static = false;
+  realParams = { };
+  returnType = "char[]";
+}
+
+method strCharIndexOf  // int strIndexOf(string, char ch, int fromIndex)
+{
+  type = "java.lang.String";
+  realMethod = "indexOf";
+  static = false;
+  realParams = { "int", "int" };
+  returnType = "int";
+}
+
+method strCharLastIndexOf  // int strLastIndexOf(string, char ch, int fromIndex)
+{
+  type = "java.lang.String";
+  realMethod = "lastIndexOf";
+  static = false;
+  realParams = { "int", "int" };
+  returnType = "int";
+}
+
+method strIndexOf  // int strIndexOf(string, string searchStr, int fromIndex)
+{
+  type = "java.lang.String";
+  realMethod = "indexOf";
+  static = false;
+  realParams = { "string", "int" };
+  returnType = "int";
+}
+
+method strLastIndexOf  // int strLastIndexOf(string, string searchStr, int fromIndex)
+{
+  type = "java.lang.String";
+  realMethod = "lastIndexOf";
+  static = false;
+  realParams = { "string", "int" };
+  returnType = "int";
+}
+
+method strCharAt  // int strCharAt(string, int index)
+{
+  type = "java.lang.String";
+  realMethod = "charAt";
+  static = false;
+  realParams = { "int" };
+  returnType = "char";
+}
+
+method strToLowerCase  // string strToLowerCase(string)
+{
+  type = "java.lang.String";
+  realMethod = "toLowerCase";
+  static = false;
+  realParams = { };
+  returnType = "string";
+}
+
+method strToUpperCase  // string strToUpperCase(string)
+{
+  type = "java.lang.String";
+  realMethod = "toUpperCase";
+  static = false;
+  realParams = { };
+  returnType = "string";
+}
+
+method strTrim  // string strTrim(string)
+{
+  type = "java.lang.String";
+  realMethod = "trim";
+  static = false;
+  realParams = { };
+  returnType = "string";
+}
+
+method strReplaceChar  // string strReplaceChar(string, char oldChar, char newChar)
+{
+  type = "java.lang.String";
+  realMethod = "replace";
+  static = false;
+  realParams = { "char", "char" };
+  returnType = "string";
+}
+
+method strReplaceAll  // string strReplaceAll(string, string regex, string newStr)
+{
+  type = "java.lang.String";
+  realMethod = "replaceAll";
+  static = false;
+  realParams = { "string", "string" };
+  returnType = "string";
+}
+
+method strReplaceFirst  // string strReplaceFirst(string, string regex, string newStr)
+{
+  type = "java.lang.String";
+  realMethod = "replaceFirst";
+  static = false;
+  realParams = { "string", "string" };
+  returnType = "string";
+}
+
+method strStartsWith  // boolean strStartsWith(string, string prefix, int offset)
+{
+  type = "java.lang.String";
+  realMethod = "startsWith";
+  static = false;
+  realParams = { "string", "int" };
+  returnType = "boolean";
+}
+
+method strEndsWith  // boolean strEndsWith(string, string prefix, int offset)
+{
+  type = "java.lang.String";
+  realMethod = "endsWith";
+  static = false;
+  realParams = { "string", "int" };
+  returnType = "boolean";
+}
+
+// end string helper functions

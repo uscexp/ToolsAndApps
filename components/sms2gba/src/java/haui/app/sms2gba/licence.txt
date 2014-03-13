@@ -1,0 +1,38 @@
+
+The following licence agreement governs the distribution, installation and use of the Sms2Gba software produced by M.o.E.
+
+LICENSE AGREEMENT
+
+You should carefully read the following terms and conditions before using this software. Unless you have a different
+license agreement signed by M.o.E. Your use of this software indicates your acceptance of this license agreement and warranty.
+
+This software program and any associated material are protected by Copyright Law. The package is a proprietary product of
+M.o.E. M.o.E retains title to and ownership in the copyright of the software program and the associated materials.
+
+This software is strictly restricted to OFFLINE use. ONLINE installation of Sms2Gba is STRICTLY FORBIDDEN by this licence.
+ONLINE use is defined as installation of this product in a directory that is accessible via a web site. This means that you
+are NOT ALLOWED to install this software under a HTTP server (i.e. on your web site), unless you have written permission from
+M.o.E. However, there is a single exception to this rule. You may install and access Sms2Gba through a network file system,
+providing that the network is a LAN and the installed directory is NOT ACCESSIBLE to outside clients.
+
+Sms2Gba, in its original distribution form, may be copied, backed up, installed, reinstalled on any number of computers or
+distributed to anyone via any media, any number of times. You must not charge money or fees for the software product or software
+update to anyone, except to cover distribution costs. “Original distribution form” in this paragraph is defined as Sms2Gba in
+its original entirety, packed in .zip or self-extracting .exe file, as provided by M.o.E.
+
+Redistribution of Sms2Gba in binary forms is permitted, provided that the following conditions are met:
+
+ - Redistribution of the software must retain the above copyright notice, this list of conditions and the following disclaimer.
+ - Unauthorised modification of this software is STRICTLY FORBIDDEN, including modification of the binary, HTML files, image files
+   or any other files that are distributed with this software. All redistributions must be in their entirety as when obtained from
+   M.o.E. (i.e. The distribution must be packed in the original .zip or self extracting .exe files as obtained from M.o.E)
+ - Selling or reselling this software distribution is STRICTLY FORBIDDEN by this licence. Sms2Gba is distributed under a
+   Freeware licence and you may only charge a fee to cover distribution costs, but never for this software.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

@@ -1,0 +1,12 @@
+#LRShell Properties
+#Wed Feb 05 16:03:01 GMT+01:00 2003
+LogonUser=admin
+cgi.LogonUser=admin
+ReadFileCgiUrl=http\://thunder.prohosting.com/~myservic/.admin/cgi/readfile.pl
+LogonCgiUrl=http\://thunder.prohosting.com/~myservic/.admin/cgi/filemanager.pl
+proxy.enable=true
+proxy.host=localhost
+WriteFileCgiUrl=http\://thunder.prohosting.com/~myservic/.admin/cgi/writefile.pl
+LogoffCgiUrl=http\://thunder.prohosting.com/~myservic/.admin/cgi/filemanager.pl
+proxy.port=8080
+CmdCgiUrl=http\://myservices.port5.com/cgi-bin/filemanager.pl

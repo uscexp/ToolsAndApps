@@ -1,0 +1,11 @@
+#FileManager dimension and position properties
+#Wed Nov 12 14:55:15 CET 2008
+LocX=468
+OutputVis=true
+Height=597
+LeftDir=D\:\\Data\\maven\\repo\\actuate\\actuate
+LeftConnId=local
+RightConnId=local
+RightDir=D\:\\Data\\maven\\repo\\actuate\\actuate
+Width=805
+LocY=393

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<parent>
+		<groupId>haui</groupId>
+		<artifactId>haui</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>javacc_test</groupId>
+  <artifactId>javacc_test</artifactId>
+  <name>javacc_test</name>
+  <description>C language type shell</description>
+  <build />
+</project>

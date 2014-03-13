@@ -1,0 +1,6 @@
+#HttpTunnelClientServer application properties
+#Wed Oct 01 13:59:11 CEST 2003
+proxy.enable=true
+proxy.host=localhost
+Servlet=http\://www.myjavaserver.com/servlet/haui.servlets.HTS
+proxy.port=8080
