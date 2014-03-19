@@ -583,7 +583,7 @@ public class File implements Serializable, Comparable
     {
       security.checkRead( path);
     }
-    return fs.checkAccess( this, false);
+    return fs.checkAccess( this, FileSystem.ACCESS_READ);
   }
 
   /**
@@ -604,7 +604,7 @@ public class File implements Serializable, Comparable
     {
       security.checkWrite( path);
     }
-    return fs.checkAccess( this, true);
+    return fs.checkAccess( this, FileSystem.ACCESS_WRITE);
   }
 
   /**
@@ -818,7 +818,7 @@ public class File implements Serializable, Comparable
     {
       security.checkDelete( path);
     }
-    fs.deleteOnExit( this);
+    DeleteOnExitHook.add(path);
   }
 
   /**

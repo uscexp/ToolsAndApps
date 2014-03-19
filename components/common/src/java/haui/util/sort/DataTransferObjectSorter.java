@@ -12,7 +12,7 @@
 package haui.util.sort;
 
 import haui.model.DataTransferObject;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 import haui.util.SortUtil;
 
 import java.lang.reflect.Method;
@@ -168,7 +168,7 @@ public abstract class DataTransferObjectSorter
 
           if(method1 == null)
           {
-            method1 = ClassUtil.getGetterMethod(o1.getClass(), sort[i]);
+            method1 = ReflectionUtil.getGetterMethod(o1.getClass(), sort[i]);
             if(method1 != null)
               methodMap.put(pair1, method1);
           }
@@ -178,7 +178,7 @@ public abstract class DataTransferObjectSorter
               method2 = method1;
             else
             {
-              method2 = ClassUtil.getGetterMethod(o2.getClass(), sort[i]);
+              method2 = ReflectionUtil.getGetterMethod(o2.getClass(), sort[i]);
               if(method2 != null)
                 methodMap.put(pair2, method2);
             }
@@ -216,7 +216,7 @@ public abstract class DataTransferObjectSorter
 
               if(compareMethod == null)
               {
-                compareMethod = ClassUtil.getDeclaredMethod(object1.getClass(), compareMethodName, types);
+                compareMethod = ReflectionUtil.getDeclaredMethod(object1.getClass(), compareMethodName, types);
                 methodMap.put(comparePair, compareMethod);
               }
             }

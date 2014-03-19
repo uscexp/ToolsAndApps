@@ -15,7 +15,7 @@ import haui.io.FileInterface.configuration.FileInterfaceConfiguration;
 import haui.io.FileInterface.filter.FileInterfaceFilter;
 import haui.swing.filechooser.FileView;
 import haui.swing.plaf.FileInterfaceChooserUI;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -771,7 +771,7 @@ public class JFileInterfaceChooser extends JComponent implements Accessible
     Window window = null;
     try
     {
-      window = (Window)ClassUtil.invokeStaticMethod(JOptionPane.class, "getWindowForComponent",
+      window = (Window)ReflectionUtil.invokeStaticMethod(JOptionPane.class, "getWindowForComponent",
           (new Class[]{Component.class}), (new Object[]{parent}));
     }
     catch(Exception e)
@@ -2206,10 +2206,10 @@ public class JFileInterfaceChooser extends JComponent implements Accessible
       byte count = 0;
       try
       {
-        Byte co = (Byte)ClassUtil.invokeStaticMethod(JComponent.class, "getWriteObjCounter",
+        Byte co = (Byte)ReflectionUtil.invokeStaticMethod(JComponent.class, "getWriteObjCounter",
             null, new Object[]{this});
         count = co.byteValue();
-        ClassUtil.invokeStaticMethod(JComponent.class, "setWriteObjCounter",
+        ReflectionUtil.invokeStaticMethod(JComponent.class, "setWriteObjCounter",
             null, new Object[]{this, new Byte(--count)});
       }
       catch(Exception e)

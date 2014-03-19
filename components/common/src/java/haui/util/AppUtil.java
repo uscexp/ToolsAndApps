@@ -83,7 +83,7 @@ public class AppUtil
       }
       try
       {
-        Class clazz = ClassUtil.loadClass(type);
+        Class clazz = ReflectionUtil.loadClass(type);
         if(clazz != null)
         {
           if(value.getClass().equals(clazz))

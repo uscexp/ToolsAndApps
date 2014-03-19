@@ -12,7 +12,7 @@
 package haui.model.admin;
 
 import haui.model.execution.AbstractEventDTO;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 
 /**
  * ExternalEventJobDTO
@@ -42,7 +42,7 @@ public class ExternalEventJobDTO extends AdminJobDTO
   @Override
   public String getExecutableIdentifier()
   {
-    String id = ClassUtil.getShortName(AdminJobDTO.class);
+    String id = ReflectionUtil.getShortName(AdminJobDTO.class);
     id += event.getStid();
     return id;
   }

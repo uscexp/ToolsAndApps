@@ -11,6 +11,7 @@ import haui.io.FileInterface.configuration.FileInterfaceConfiguration;
 import haui.io.FileInterface.filter.FileInterfaceFilter;
 import haui.util.CommandClass;
 import haui.util.GlobalApplicationContext;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
@@ -21,7 +22,10 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
@@ -49,12 +53,12 @@ public class CgiTypeFile extends DuFile
   public final static int BUFFERSIZE = 32768;
 
   // member variables
-  String m_parentPath;
-  Vector m_cgiEntries = new Vector();
-  String m_curCgiEntry;
-  LRShell m_lrsTerm = null;
-  JDialog m_dlgTerm = null;
-  boolean m_blLogon = false;
+  String parentPath;
+  List<String> cgiEntries = new ArrayList<>();
+  String curCgiEntry;
+  LRShell lrsTerm = null;
+  JDialog dlgTerm = null;
+  boolean logon = false;
 
   BufferedOutputStream m_bos = null;
 
@@ -66,23 +70,23 @@ public class CgiTypeFile extends DuFile
   private CgiTypeFile( String strPath, boolean blDirectory, char cSeparator, FileInterfaceConfiguration fic)
   {
     super( strPath, blDirectory, cSeparator, fic);
-    m_curCgiEntry = super.getName();
-    m_blRead = super.canRead();
-    m_blWrite = super.canWrite();
-    m_strAbsolutePath = super.getAbsolutePath();
-    m_strHost = super.getHost();
-    m_strPath = super.getAbsolutePath();
-    m_strName = super.getName();
-    m_strParent = super.getParent();
-    if( m_parentPath == null)
+    curCgiEntry = super.getName();
+    read = super.canRead();
+    write = super.canWrite();
+    absolutePath = super.getAbsolutePath();
+    host = super.getHost();
+    strPath = super.getAbsolutePath();
+    name = super.getName();
+    parent = super.getParent();
+    if( parentPath == null)
     {
-      m_parentPath = getAbsolutePath();
+      parentPath = getAbsolutePath();
       int iIdx = -1;
-      if( m_parentPath.length() > 2)
+      if( parentPath.length() > 2)
       {
-        for( int i = m_parentPath.length() - 3; i >= 0; i--)
+        for( int i = parentPath.length() - 3; i >= 0; i--)
         {
-          char c = m_parentPath.charAt( i);
+          char c = parentPath.charAt( i);
           if( c == separatorChar())
           {
             iIdx = i + 1;
@@ -91,16 +95,16 @@ public class CgiTypeFile extends DuFile
         }
       }
       if( iIdx == -1)
-        m_parentPath = null;
+        parentPath = null;
       else
-        m_parentPath = m_parentPath.substring( 0, iIdx);
+        parentPath = parentPath.substring( 0, iIdx);
     }
-    m_blArchive = super.isArchive();
-    m_blDirectory = super.isDirectory();
-    m_blFile = super.isFile();
-    m_blHidden = super.isHidden();
-    m_lModified = super.lastModified();
-    m_lLength = super.length();
+    archive = super.isArchive();
+    blDirectory = super.isDirectory();
+    fileType = super.isFile();
+    hidden = super.isHidden();
+    modified = super.lastModified();
+    length = super.length();
   }
 
   /**
@@ -112,7 +116,7 @@ public class CgiTypeFile extends DuFile
   {
     super( strCgiPath, fic);
     logon();
-    m_intPath = strCgiPath;
+    intPath = strCgiPath;
     // init data
     ConnectionManager cm = ( (CgiTypeFileInterfaceConfiguration)fic).getConnectionManager();
     cm.resetPostParams();
@@ -129,57 +133,57 @@ public class CgiTypeFile extends DuFile
     while( !( line = cm.readLine()).equalsIgnoreCase( ConnectionManager.SOF))
       ;
     line = cm.readLine();
-    m_strPath = line;
+    path = line;
     line = cm.readLine();
-    m_cSeparator = line.charAt( 0);
+    separator = line.charAt( 0);
     line = cm.readLine();
-    m_blRead = line.equals( "0") ? false : true;
+    read = line.equals( "0") ? false : true;
     line = cm.readLine();
-    m_blWrite = line.equals( "0") ? false : true;
+    write = line.equals( "0") ? false : true;
     line = cm.readLine();
-    m_blDirectory = line.equals( "0") ? false : true;
+    directory = line.equals( "0") ? false : true;
     line = cm.readLine();
-    m_blArchive = false;
-    m_blFile = line.equals( "0") ? false : true;
+    archive = false;
+    fileType = line.equals( "0") ? false : true;
     line = cm.readLine();
-    m_blHidden = line.equals( "0") ? false : true;
+    hidden = line.equals( "0") ? false : true;
     line = cm.readLine();
-    m_lLength = ( new Long( line)).longValue();
+    length = ( new Long( line)).longValue();
     line = cm.readLine();
-    m_strName = line;
+    name = line;
     line = cm.readLine();
-    m_strAbsolutePath = line;
+    absolutePath = line;
     line = cm.readLine();
     if( strParentPath == null)
-      m_strParent = line;
+      parent = line;
     else
     {
-      m_parentPath = strParentPath;
-      m_strParent = strParentPath;
+      parentPath = strParentPath;
+      parent = strParentPath;
     }
 
-    int idx = m_strPath.lastIndexOf( separatorChar());
-    if( idx > 0 && idx == m_strPath.length() - 1)
-      m_strPath = m_strPath.substring( 0, m_strPath.length() - 1);
-    idx = m_strAbsolutePath.lastIndexOf( separatorChar());
-    if( idx > 0 && idx == m_strAbsolutePath.length() - 1)
-      m_strAbsolutePath = m_strAbsolutePath.substring( 0, m_strAbsolutePath.length() - 1);
-    idx = m_strParent.lastIndexOf( separatorChar());
-    if( idx > 0 && idx == m_strParent.length() - 1)
-      m_strParent = m_strParent.substring( 0, m_strParent.length() - 1);
+    int idx = path.lastIndexOf( separatorChar());
+    if( idx > 0 && idx == path.length() - 1)
+      path = path.substring( 0, path.length() - 1);
+    idx = absolutePath.lastIndexOf( separatorChar());
+    if( idx > 0 && idx == absolutePath.length() - 1)
+      absolutePath = absolutePath.substring( 0, absolutePath.length() - 1);
+    idx = parent.lastIndexOf( separatorChar());
+    if( idx > 0 && idx == parent.length() - 1)
+      parent = parent.substring( 0, parent.length() - 1);
 
     line = cm.readLine();
     int iRootCount = ( new Integer( line)).intValue();
-    m_fiRoots = new CgiTypeFile[iRootCount];
+    fileInterfaceRoots = new CgiTypeFile[iRootCount];
     for( int i = 0; i < iRootCount; i++)
     {
       line = cm.readLine();
-      m_fiRoots[i] = new CgiTypeFile( line, true, separatorChar(), getFileInterfaceConfiguration());
+      fileInterfaceRoots[i] = new CgiTypeFile( line, true, separatorChar(), getFileInterfaceConfiguration());
     }
 
     line = cm.readLine();
     // TODO: Convert date from float to long (server)
-    m_lModified = 100;
+    modified = 100;
     // m_dateModified = new Date( (new Long( line)).longValue());
 
     cm.disconnect();
@@ -187,7 +191,7 @@ public class CgiTypeFile extends DuFile
     idx = strCgiPath.lastIndexOf( separatorChar());
     if( idx > 0 && idx == strCgiPath.length() - 1)
       strCgiPath = strCgiPath.substring( 0, strCgiPath.length() - 1);
-    m_intPath = strCgiPath;
+    intPath = strCgiPath;
   }
 
   public FileInterface duplicate()
@@ -206,7 +210,7 @@ public class CgiTypeFile extends DuFile
 
   public String getId()
   {
-    return "Cgi-" + m_strHost;
+    return "Cgi-" + host;
   }
 
   /**
@@ -221,78 +225,78 @@ public class CgiTypeFile extends DuFile
 
   public void setSeperatorChar( char cSeperator)
   {
-    m_cSeparator = cSeperator;
+    separator = cSeperator;
   }
 
   public void setReadable( boolean blRead)
   {
-    m_blRead = blRead;
+    blRead = blRead;
   }
 
   public void setWriteable( boolean blWrite)
   {
-    m_blWrite = blWrite;
+    blWrite = blWrite;
   }
 
   public void setDirectory( boolean blDirectory)
   {
-    m_blDirectory = blDirectory;
+    blDirectory = blDirectory;
   }
 
   public void setArchive( boolean blArchive)
   {
-    m_blArchive = blArchive;
+    blArchive = blArchive;
   }
 
   public void setFile( boolean blFile)
   {
-    m_blFile = blFile;
+    blFile = blFile;
   }
 
   public void setHidden( boolean blHidden)
   {
-    m_blHidden = blHidden;
+    blHidden = blHidden;
   }
 
   public void setLength( long lLength)
   {
-    m_lLength = lLength;
+    length = lLength;
   }
 
   public void setName( String strName)
   {
-    m_strName = strName;
+    strName = strName;
   }
 
   public void setParent( String strParent)
   {
-    m_strParent = strParent;
+    strParent = strParent;
   }
 
   public void setPath( String strPath)
   {
-    m_strPath = strPath;
+    strPath = strPath;
   }
 
   public void setAbsolutePath( String strAbsolutePath)
   {
-    m_strAbsolutePath = strAbsolutePath;
+    strAbsolutePath = strAbsolutePath;
   }
 
   public void setRoots( CgiTypeFile[] fiRoots)
   {
-    m_fiRoots = fiRoots;
+    fileInterfaceRoots = fiRoots;
   }
 
   public boolean setLastModified( long time)
   {
-    m_lModified = time;
+    modified = time;
     return true;
   }
 
   public void setHost( String strHost)
   {
-    m_strHost = strHost;
+    host = strHost;
   }
 
   public BufferedInputStream getBufferedInputStream() throws FileNotFoundException, IOException
@@ -408,12 +412,12 @@ public class CgiTypeFile extends DuFile
 
   public FileInterface[] _listRoots()
   {
-    return m_fiRoots;
+    return fileInterfaceRoots;
   }
 
   public char separatorChar()
   {
-    return m_cSeparator;
+    return separator;
   }
 
   public char pathSeparatorChar()
@@ -424,32 +428,32 @@ public class CgiTypeFile extends DuFile
 
   public boolean canRead()
   {
-    return m_blRead;
+    return read;
   }
 
   public boolean canWrite()
   {
-    return m_blWrite;
+    return write;
   }
 
   public boolean isDirectory()
   {
-    return m_blDirectory;
+    return directory;
   }
 
   public boolean isArchive()
   {
-    return m_blArchive;
+    return archive;
   }
 
   public boolean isFile()
   {
-    return m_blFile;
+    return fileType;
   }
 
   public boolean isHidden()
   {
-    return m_blHidden;
+    return hidden;
   }
 
   public URL toURL()
@@ -461,31 +465,31 @@ public class CgiTypeFile extends DuFile
 
   public long length()
   {
-    return m_lLength;
+    return length;
   }
 
   public String getName()
   {
-    if( m_strName == null)
+    if( name == null)
       // nessecary for the initialisation
       return super.getName();
     else
-      return m_strName;
+      return name;
   }
 
   public String getAbsolutePath()
   {
-    return m_strAbsolutePath;
+    return absolutePath;
   }
 
   public FileInterface getCanonicalFile() throws IOException
   {
-    return new CgiTypeFile( m_curCgiEntry, m_parentPath, getFileInterfaceConfiguration());
+    return new CgiTypeFile( curCgiEntry, parentPath, getFileInterfaceConfiguration());
   }
 
   public String getPath()
   {
-    return m_strPath;
+    return path;
   }
 
   public FileInterface getDirectAccessFileInterface()
@@ -510,13 +514,13 @@ public class CgiTypeFile extends DuFile
 
   public String getParent()
   {
-    return m_strParent;
+    return parent;
   }
 
   public FileInterface getParentFileInterface()
   {
     boolean blExtract = false;
-    if( m_intPath != null && !m_intPath.equals( "") && m_intPath.indexOf( separatorChar()) != -1)
+    if( intPath != null && !intPath.equals( "") && intPath.indexOf( separatorChar()) != -1)
       blExtract = true;
     FileInterface fi = FileConnector.createFileInterface( getParent(), null, blExtract, getFileInterfaceConfiguration());
     return fi;
@@ -524,25 +528,25 @@ public class CgiTypeFile extends DuFile
 
   public long lastModified()
   {
-    return m_lModified;
+    return modified;
   }
 
   public String[] list()
   {
-    if( m_strList != null)
-      return m_strList;
-    m_strList = new String[0];
-    if( isDirectory() || ( m_curCgiEntry == null && isArchive()))
+    if( list != null)
+      return list;
+    list = new String[0];
+    if( isDirectory() || ( curCgiEntry == null && isArchive()))
     {
-      if( m_fiList == null)
+      if( fileInterfaces == null)
         _listFiles();
-      m_strList = new String[Array.getLength( m_fiList)];
-      for( int i = 0; i < Array.getLength( m_fiList); ++i)
+      list = new String[Array.getLength( fileInterfaces)];
+      for( int i = 0; i < Array.getLength( fileInterfaces); ++i)
       {
-        m_strList[i] = m_fiList[i].getAbsolutePath();
+        list[i] = fileInterfaces[i].getAbsolutePath();
       }
     }
-    return m_strList;
+    return list;
   }
 
   public FileInterface[] _listFiles( FileInterfaceFilter filter)
@@ -551,9 +555,9 @@ public class CgiTypeFile extends DuFile
     // return m_fiList;
     CgiTypeFile[] cgis = new CgiTypeFile[0];
     Vector vec = null;
-    m_fiList = (FileInterface[])cgis;
+    fileInterfaces = (FileInterface[])cgis;
     ConnectionManager cm = ( (CgiTypeFileInterfaceConfiguration)getFileInterfaceConfiguration()).getConnectionManager();
-    if( isDirectory() || ( m_curCgiEntry == null && isArchive()))
+    if( isDirectory() || ( curCgiEntry == null && isArchive()))
     {
       cm.resetPostParams();
       cm.addPostParam( ACTION, "initFileInfoArray");
@@ -638,17 +642,17 @@ public class CgiTypeFile extends DuFile
           cgis[j] = (CgiTypeFile)vec.elementAt( j);
       }
     }
-    m_fiList = (FileInterface[])cgis;
-    return m_fiList;
+    fileInterfaces = (FileInterface[])cgis;
+    return fileInterfaces;
   }
 
   public FileInterface[] _listFiles()
   {
-    if( m_fiList != null)
-      return m_fiList;
+    if( fileInterfaces != null)
+      return fileInterfaces;
     CgiTypeFile[] cgis = new CgiTypeFile[0];
     ConnectionManager cm = ( (CgiTypeFileInterfaceConfiguration)getFileInterfaceConfiguration()).getConnectionManager();
-    if( isDirectory() || ( m_curCgiEntry == null && isArchive()))
+    if( isDirectory() || ( curCgiEntry == null && isArchive()))
     {
       cm.resetPostParams();
       cm.addPostParam( ACTION, "initFileInfoArray");
@@ -714,8 +718,8 @@ public class CgiTypeFile extends DuFile
 
       cm.disconnect();
     }
-    m_fiList = (FileInterface[])cgis;
-    return m_fiList;
+    fileInterfaces = (FileInterface[])cgis;
+    return fileInterfaces;
   }
 
   public boolean renameTo( FileInterface file)
@@ -740,12 +744,12 @@ public class CgiTypeFile extends DuFile
     if( blRet)
     {
       line = cm.readLine();
-      m_strPath = line;
+      path = line;
       line = cm.readLine();
-      m_strName = line;
+      name = line;
       line = cm.readLine();
       // TODO: Convert date from float to long (server)
-      m_lModified = 100;
+      modified = 100;
       // m_dateModified = new Date( (new Long( line)).longValue());
     }
     cm.disconnect();
@@ -776,11 +780,11 @@ public class CgiTypeFile extends DuFile
 
   public boolean mkdir()
   {
-    m_fiList = null;
-    m_strList = null;
-    m_blArchive = false;
-    m_blDirectory = true;
-    m_blFile = false;
+    fileInterfaces = null;
+    list = null;
+    archive = false;
+    directory = true;
+    fileType = false;
     ConnectionManager cm = ( (CgiTypeFileInterfaceConfiguration)getFileInterfaceConfiguration()).getConnectionManager();
     cm.resetPostParams();
     cm.addPostParam( ACTION, "mkdir");
@@ -801,7 +805,7 @@ public class CgiTypeFile extends DuFile
     if( blRet)
     {
       line = cm.readLine();
-      m_strPath = line;
+      path = line;
     }
     cm.disconnect();
     return blRet;
@@ -836,11 +840,11 @@ public class CgiTypeFile extends DuFile
     if( getFileInterfaceConfiguration().getAppProperties().getProperty( GlobalApplicationContext.LOGONUSER) == null
         || getFileInterfaceConfiguration().getAppProperties().getProperty( GlobalApplicationContext.LOGONUSER).equals( ""))
     {
-      m_blLogon = false;
+      logon = false;
       return;
     }
     else
-      m_blLogon = true;
+      logon = true;
     cm.resetPostParams();
     cm.addPostParam( CgiTypeFile.ACTION, "logon");
     String strPass = getFileInterfaceConfiguration().getAppProperties().getProperty( GlobalApplicationContext.LOGONPASSWORD);
@@ -856,11 +860,11 @@ public class CgiTypeFile extends DuFile
     if( getFileInterfaceConfiguration().getAppProperties().getProperty( GlobalApplicationContext.LOGONUSER) == null
         || getFileInterfaceConfiguration().getAppProperties().getProperty( GlobalApplicationContext.LOGONUSER).equals( ""))
     {
-      m_blLogon = false;
+      logon = false;
       return;
     }
     else
-      m_blLogon = true;
+      logon = true;
     cm.addPostParam( CgiTypeFile.PARAM, getFileInterfaceConfiguration().getAppProperties().getProperty( GlobalApplicationContext.LOGONUSER));
     cm.addPostParam( CgiTypeFile.PATH, strPass);
 
@@ -885,7 +889,7 @@ public class CgiTypeFile extends DuFile
 
   public void logoff()
   {
-    if( !m_blLogon)
+    if( !logon)
       return;
     ConnectionManager cm = ( (CgiTypeFileInterfaceConfiguration)getFileInterfaceConfiguration()).getConnectionManager();
     cm.resetPostParams();
@@ -908,10 +912,10 @@ public class CgiTypeFile extends DuFile
     readToStdOut( cm, getFileInterfaceConfiguration().getAppName());
     cm.disconnect();
     // dispose treminal instance
-    if( m_dlgTerm != null)
+    if( dlgTerm != null)
     {
-      m_dlgTerm.dispose();
-      m_dlgTerm = null;
+      dlgTerm.dispose();
+      dlgTerm = null;
     }
     return;
   }
@@ -942,20 +946,20 @@ public class CgiTypeFile extends DuFile
 
   public void startTerminal()
   {
-    if( m_lrsTerm == null)
+    if( lrsTerm == null)
     {
-      m_lrsTerm = new LRShell( getFileInterfaceConfiguration().getAppProperties());
-      m_lrsTerm.init();
+      lrsTerm = new LRShell( getFileInterfaceConfiguration().getAppProperties());
+      lrsTerm.init();
     }
-    if( m_dlgTerm == null)
+    if( dlgTerm == null)
     {
-      m_dlgTerm = new JExDialog( null, "LRShell - " + getId(), false, getAppName());
-      m_dlgTerm.getContentPane().add( "Center", m_lrsTerm);
-      m_lrsTerm.setTopComponent( m_dlgTerm);
-      m_dlgTerm.pack();
+      dlgTerm = new JExDialog( null, "LRShell - " + getId(), false, getAppName());
+      dlgTerm.getContentPane().add( "Center", lrsTerm);
+      lrsTerm.setTopComponent( dlgTerm);
+      dlgTerm.pack();
     }
-    if( !m_dlgTerm.isVisible())
-      m_dlgTerm.setVisible( true);
+    if( !dlgTerm.isVisible())
+      dlgTerm.setVisible( true);
   }
 
   /**

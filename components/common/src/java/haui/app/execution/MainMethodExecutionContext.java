@@ -25,7 +25,7 @@ import haui.exception.AppSystemException;
 import haui.model.execution.ExecutionIdentifier;
 import haui.model.execution.ExecutionInfoDTO;
 import haui.model.partner.UserDTO;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 import haui.util.DateUtil;
 import haui.util.GlobalApplicationContext;
 
@@ -167,7 +167,7 @@ public class MainMethodExecutionContext implements ExecutionContext
           GlobalApplicationContext.CURRENT_USER_MAPPER_CLASS, GlobalApplicationContext.CURRENT_USER_MAPPER_CLASS_DEFAULT_CLASS);
       try
       {
-        setCurrentUserMapper((ICurrentUserMapper)ClassUtil.newInstance(className));
+        setCurrentUserMapper((ICurrentUserMapper)ReflectionUtil.newInstance(className));
       }
       catch(Exception e)
       {

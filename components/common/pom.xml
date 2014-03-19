@@ -67,6 +67,11 @@
 		<artifactId>comm</artifactId>
 		<version>20</version>
     </dependency>
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-compress</artifactId>
+		<version>1.7</version>
+	</dependency>
     <dependency>
 		<groupId>commons-logging</groupId>
 		<artifactId>commons-logging</artifactId>
@@ -74,9 +79,9 @@
         <scope>compile</scope>
     </dependency>
 	<dependency>
-		<groupId>commons-lang</groupId>
-		<artifactId>commons-lang</artifactId>
-		<version>2.6</version>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-lang3</artifactId>
+		<version>3.2.1</version>
 		<scope>compile</scope>
 	</dependency>
 	<dependency>
@@ -89,16 +94,6 @@
 		<groupId>javax.activation</groupId>
 		<artifactId>activation</artifactId>
 		<version>1.1-rev-1</version>
-    </dependency>
-    <dependency>
-		<groupId>javatar</groupId>
-		<artifactId>javatar</artifactId>
-		<version>2.5</version>
-    </dependency>
-    <dependency>
-      <groupId>jazzlib</groupId>
-      <artifactId>jazzlib</artifactId>
-      <version>0.07</version>
     </dependency>
     <dependency>
 		<groupId>log4j</groupId>

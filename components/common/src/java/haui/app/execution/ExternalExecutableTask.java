@@ -16,7 +16,7 @@ import haui.exception.AppLogicException;
 import java.lang.reflect.Constructor;
 
 import haui.model.execution.AbstractEventDTO;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 
 /**
  * ExternalExecutableTask
@@ -47,7 +47,7 @@ public class ExternalExecutableTask extends AppSequencialTask
     super.init(executioncontext);
     try
     {
-      Class executableClass = ClassUtil.loadClass(executionEvent.getExecutionClass());
+      Class executableClass = ReflectionUtil.loadClass(executionEvent.getExecutionClass());
 
       Class[] paramTypes = new Class[1];
       paramTypes[0] = AbstractEventDTO.class;
@@ -75,7 +75,7 @@ public class ExternalExecutableTask extends AppSequencialTask
 
   public String getIdentifier()
   {
-    String id = ClassUtil.getShortName(ExternalExecutableTask.class);
+    String id = ReflectionUtil.getShortName(ExternalExecutableTask.class);
     id += executionEvent.getStid();
     return id;
   }

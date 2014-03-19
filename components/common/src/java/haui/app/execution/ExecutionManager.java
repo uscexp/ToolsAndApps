@@ -21,7 +21,7 @@ import haui.model.admin.AdminJobDTO;
 import haui.model.core.AbstractMultiApplicationSingleton;
 import haui.model.execution.ExecutionIdentifier;
 import haui.model.execution.ExecutionInfoDTO;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 
 import java.security.Principal;
 import java.util.Collection;
@@ -324,7 +324,7 @@ public abstract class ExecutionManager extends AbstractMultiApplicationSingleton
     Class serviceBOClass = null;
     try
     {
-      serviceBOClass = ClassUtil.loadClass("com.ubs.arte.app.logic.admin.AdminJobBO");
+      serviceBOClass = ReflectionUtil.loadClass("com.ubs.arte.app.logic.admin.AdminJobBO");
     }
     catch(Exception e)
     {

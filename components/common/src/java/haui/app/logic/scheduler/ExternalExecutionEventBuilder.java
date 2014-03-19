@@ -20,7 +20,7 @@ import haui.app.logic.jobs.ExternalEventJob;
 import haui.model.admin.AdminJobDTO;
 import haui.model.admin.ExternalEventJobDTO;
 import haui.model.execution.AbstractEventDTO;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 
 /**
  * ExternalExecutionEventBuilder
@@ -36,7 +36,7 @@ public class ExternalExecutionEventBuilder
     assert executionEvent != null: "executionEvent is null";
 
     // create instance of AppExecutable
-    Class eventClass = ClassUtil.loadClass(executionEvent.getEventType());
+    Class eventClass = ReflectionUtil.loadClass(executionEvent.getEventType());
     AppJob job = new ExternalEventJob(new ExternalExecutableTask(executionEvent));
     AdminJobDTO adminJob = new ExternalEventJobDTO(executionEvent);
 

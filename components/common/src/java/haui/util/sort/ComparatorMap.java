@@ -13,7 +13,7 @@ package haui.util.sort;
 
 import haui.exception.ValidationException;
 import haui.model.DataTransferObject;
-import haui.util.ClassUtil;
+import haui.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -113,7 +113,7 @@ public class ComparatorMap
 
           try
           {
-            tmpClass = ClassUtil.loadClass(stringBuffer.toString());
+            tmpClass = ReflectionUtil.loadClass(stringBuffer.toString());
           }
           catch(Exception e)
           {

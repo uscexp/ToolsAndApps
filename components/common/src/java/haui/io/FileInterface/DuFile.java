@@ -28,9 +28,9 @@ public abstract class DuFile
   extends BaseTypeFile
 {
   // member variables
-  protected String m_intPath;
+  protected String intPath;
 
-  char m_cSeparator;
+  char separator;
 
   /**
    * Creates a new DuFile instance.
@@ -40,16 +40,16 @@ public abstract class DuFile
   public DuFile( String strPath, boolean blDirectory, char cSeparator, FileInterfaceConfiguration fic)
   {
     super( fic);
-    m_strPath = strPath;
-    m_strAbsolutePath = strPath;
-    m_cSeparator = cSeparator;
-    m_blDirectory = blDirectory;
-    m_blFile = !blDirectory;
+    this.path = strPath;
+    this.absolutePath = strPath;
+    this.separator = cSeparator;
+    this.directory = blDirectory;
+    this.fileType = !blDirectory;
     int idx = strPath.lastIndexOf( separatorChar());
     if( idx != -1)
-      m_strName = strPath.substring( idx+1, strPath.length());
+    	this.name = strPath.substring( idx+1, strPath.length());
     else
-      m_strName = strPath;
+    	this.name = strPath;
   }
 
   /**
@@ -64,71 +64,71 @@ public abstract class DuFile
 
   public char separatorChar()
   {
-    return m_cSeparator;
+    return separator;
   }
 
   public boolean canRead()
   {
-    return m_blRead;
+    return read;
   }
 
   public boolean canWrite()
   {
-    return m_blWrite;
+    return write;
   }
 
   public boolean isDirectory()
   {
-    return m_blDirectory;
+    return directory;
   }
 
   public boolean isFile()
   {
-    return m_blFile;
+    return fileType;
   }
 
   public boolean isHidden()
   {
-    return m_blHidden;
+    return hidden;
   }
 
   public long length()
   {
-    return m_lLength;
+    return length;
   }
 
   public String getId()
   {
-    return m_strHost;
+    return host;
   }
 
   public String getName()
   {
-    return m_strName;
+    return name;
   }
 
   public String getAbsolutePath()
   {
-    return m_strAbsolutePath;
+    return absolutePath;
   }
 
   public String getPath()
   {
-    return m_strPath;
+    return path;
   }
 
   public String getInternalPath()
   {
-    return m_intPath;
+    return intPath;
   }
 
   public String getParent()
   {
-    return m_strParent;
+    return parent;
   }
 
   public long lastModified()
   {
-    return m_lModified;
+    return modified;
   }
 }
