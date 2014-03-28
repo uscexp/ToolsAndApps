@@ -1,13 +1,15 @@
 package haui.app.fm;
 
 import haui.components.JExDialog;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.List;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -25,7 +27,7 @@ public class EditBookmarkInfoDialog
 {
   private static final long serialVersionUID = -6268856486570197745L;
   
-  DefaultListModel m_dlm = new DefaultListModel();
+  DefaultListModel<BookmarkInfo> m_dlm = new DefaultListModel<>();
   JPanel m_panelBase = new JPanel();
   BorderLayout m_borderLayoutBase = new BorderLayout();
   EditBookmarkInfoPanel m_configBookmarkInfoPanel = new EditBookmarkInfoPanel();
@@ -37,7 +39,7 @@ public class EditBookmarkInfoDialog
   JLabel m_jLabelDummyRight = new JLabel();
   boolean m_ok = false;
 
-  public EditBookmarkInfoDialog(Component frame, String title, boolean modal, Vector bookmarks)
+  public EditBookmarkInfoDialog(Component frame, String title, boolean modal, List<BookmarkInfo> bookmarks)
   {
     super((Frame)null, title, modal, FileManager.APPNAME);
     setFrame( frame);
@@ -58,7 +60,7 @@ public class EditBookmarkInfoDialog
     m_jButtonCancel.addActionListener( actionlis);
   }
 
-  public EditBookmarkInfoDialog( Component frame, Vector bookmarks)
+  public EditBookmarkInfoDialog( Component frame, List<BookmarkInfo> bookmarks)
   {
     this( frame, "Edit Bookmarks", true, bookmarks);
   }
@@ -108,7 +110,7 @@ public class EditBookmarkInfoDialog
     return m_ok;
   }
 
-  public Vector getBookmark()
+  public List<BookmarkInfo> getBookmark()
   {
     return m_configBookmarkInfoPanel.getBookmark();
   }

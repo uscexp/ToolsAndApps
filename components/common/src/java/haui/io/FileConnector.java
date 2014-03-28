@@ -6,20 +6,13 @@ import haui.components.CommPortTypeServerDialog;
 import haui.components.ConnectionManager;
 import haui.components.FileTypeServerDialog;
 import haui.io.FileInterface.CgiTypeFile;
+import haui.io.FileInterface.ClientTypeFile;
 import haui.io.FileInterface.CommPortTypeFile;
+import haui.io.FileInterface.DuFile;
 import haui.io.FileInterface.FileInterface;
 import haui.io.FileInterface.FtpTypeFile;
-import haui.io.FileInterface.NormalFile;
 import haui.io.FileInterface.SocketTypeFile;
-import haui.io.FileInterface.compress.archive.ArTypeFile;
-import haui.io.FileInterface.compress.archive.ArjTypeFile;
-import haui.io.FileInterface.compress.archive.JarTypeFile;
-import haui.io.FileInterface.compress.archive.TarTypeFile;
-import haui.io.FileInterface.compress.archive.ZipTypeFile;
-import haui.io.FileInterface.compress.compressor.BZip2TypeFile;
-import haui.io.FileInterface.compress.compressor.GZipTypeFile;
-import haui.io.FileInterface.compress.compressor.XZTypeFile;
-import haui.io.FileInterface.compress.compressor.ZTypeFile;
+import haui.io.FileInterface.compress.CompressTypeFile;
 import haui.io.FileInterface.configuration.CgiTypeFileInterfaceConfiguration;
 import haui.io.FileInterface.configuration.CommPortTypeFileInterfaceConfiguration;
 import haui.io.FileInterface.configuration.CommPortTypeServerFileInterfaceConfiguration;
@@ -34,17 +27,27 @@ import haui.io.FileInterface.remote.SocketConnection;
 import haui.util.AppProperties;
 import haui.util.CommandClass;
 import haui.util.GlobalApplicationContext;
+import haui.util.ReflectionUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.comm.CommPortIdentifier;
 
+import org.apache.commons.collections.MapUtils;
+
 import cz.dhl.ftp.Ftp;
+import cz.dhl.io.CoFile;
 
 /**
  * Module: FileConnector.java<br>
@@ -118,25 +121,75 @@ import cz.dhl.ftp.Ftp;
  *        </p>
  */
 public class FileConnector {
+
+	private FileConnector() {
+	};
+
 	// constants
-	public final static String SUPPORTEDFILES[] = { ArjTypeFile.EXTENSION,
-			ArjTypeFile.EXTENSION, ZipTypeFile.EXTENSION,
-			JarTypeFile.EXTENSION, TarTypeFile.EXTENSION, XZTypeFile.EXTENSION,
-			ZTypeFile.EXTENSION, GZipTypeFile.EXTENSION,
-			GZipTypeFile.EXTENSION1, BZip2TypeFile.EXTENSION,
-			BZip2TypeFile.EXTENSION1 };
 
 	// member variables
-	public static String TempDirectory = null;
-	public static String ExtPath = null;
-	public static int SearchDepth = 0;
+	@SuppressWarnings("unchecked")
+	private static Map<String, Class<? extends FileInterface>> SUPPORTED_FILE_TYPES = MapUtils
+			.synchronizedMap(new HashMap<>());
+	@SuppressWarnings("unchecked")
+	private static Map<Class<? extends FileInterface>, String> SUPPORTED_FILE_EXTENTIONS = MapUtils
+			.synchronizedMap(new HashMap<>());
+	private static String TempDirectory = null;
+	private static String ExtPath = null;
+	private static int SearchDepth = 0;
 	private static int CurrentSearchDepth = 0;
+
+	public static void register(Class<? extends FileInterface> fiClass) {
+		try {
+			Field field = ReflectionUtil
+					.getDeclaredField(fiClass, "EXTENTIONS");
+			if (field != null) {
+				String[] extentions = (String[]) field.get(null);
+				if (extentions != null) {
+					for (int i = 0; i < extentions.length; i++) {
+						SUPPORTED_FILE_TYPES.put(extentions[i], fiClass);
+						SUPPORTED_FILE_EXTENTIONS.put(fiClass, extentions[i]);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			GlobalApplicationContext.instance().getErrorPrintStream()
+					.println(ex.getMessage());
+		}
+	}
+	
+	public static Collection<String> getSupportedFiles() {
+		return SUPPORTED_FILE_EXTENTIONS.values();
+	}
+
+	public static String getTempDirectory() {
+		return TempDirectory;
+	}
+
+	public static synchronized void setTempDirectory(String tempDirectory) {
+		TempDirectory = tempDirectory;
+	}
+
+	public static String getExtPath() {
+		return ExtPath;
+	}
+
+	public static synchronized void setExtPath(String extPath) {
+		ExtPath = extPath;
+	}
+
+	public static int getSearchDepth() {
+		return SearchDepth;
+	}
+
+	public static synchronized void setSearchDepth(int searchDepth) {
+		SearchDepth = searchDepth;
+	}
 
 	public static boolean isSupported(String strPath) {
 		boolean blRet = false;
-		// int idx = -1;
-		for (int i = 0; i < SUPPORTEDFILES.length; ++i) {
-			if (strPath.toLowerCase().endsWith(SUPPORTEDFILES[i].toLowerCase())) {
+		for (String extension : SUPPORTED_FILE_TYPES.keySet()) {
+			if (strPath.toLowerCase().endsWith(extension.toLowerCase())) {
 				blRet = true;
 				break;
 			}
@@ -151,7 +204,7 @@ public class FileConnector {
 	}
 
 	/**
-	 * Creates a new FileConnector instance.
+	 * Creates a new FileInterface instance.
 	 * 
 	 * @param strCurPath
 	 *            : current path
@@ -200,38 +253,10 @@ public class FileConnector {
 			Class<? extends FileInterface> fiType, String strCurPath,
 			String strArchPath, String strIntPath, String strParentPath,
 			FileInterfaceConfiguration fic) {
-		int iIdx = 0;
 		FileInterface fiRet = null;
 
-		if (NormalFile.class.isAssignableFrom(fiType))
-			iIdx = -1;
-		else if (JarTypeFile.class.isAssignableFrom(fiType)) {
-			iIdx = getSupportetFileIndex(JarTypeFile.EXTENSION);
-			if (iIdx == -1)
-				iIdx = getSupportetFileIndex(".zip");
-		} else if (TarTypeFile.class.isAssignableFrom(fiType))
-			iIdx = getSupportetFileIndex(TarTypeFile.EXTENSION);
-		else if (GZipTypeFile.class.isAssignableFrom(fiType)) {
-			iIdx = getSupportetFileIndex(GZipTypeFile.EXTENSION);
-			if (iIdx == -1)
-				iIdx = getSupportetFileIndex(GZipTypeFile.EXTENSION1);
-		} else if (BZip2TypeFile.class.isAssignableFrom(fiType)) {
-			iIdx = getSupportetFileIndex(BZip2TypeFile.EXTENSION);
-			if (iIdx == -1)
-				iIdx = getSupportetFileIndex(BZip2TypeFile.EXTENSION1);
-		} else if (ZipTypeFile.class.isAssignableFrom(fiType)) {
-			iIdx = getSupportetFileIndex(ZipTypeFile.EXTENSION);
-		} else if (FtpTypeFile.class.isAssignableFrom(fiType))
-			iIdx = 50;
-		else if (CgiTypeFile.class.isAssignableFrom(fiType))
-			iIdx = 51;
-		else if (SocketTypeFile.class.isAssignableFrom(fiType))
-			iIdx = 52;
-		else if (CommPortTypeFile.class.isAssignableFrom(fiType))
-			iIdx = 53;
-
 		try {
-			fiRet = getFile(iIdx, strCurPath, strArchPath, strIntPath,
+			fiRet = getFile(fiType, strCurPath, strArchPath, strIntPath,
 					strParentPath, fic);
 		} catch (IOException ex) {
 			ex.printStackTrace(GlobalApplicationContext.instance()
@@ -337,10 +362,10 @@ public class FileConnector {
 		int iIdx = -1;
 		// int iOldIdx = iIdx;
 		int iFirstIdx = -1;
-		int iFirstFile = -1;
+		Class<? extends FileInterface> firstFileType = null;
 		int iSecondIdx = -1;
 		// int iSecondFile = -1;
-		int i = -1;
+		Class<? extends FileInterface> type = null;
 		String strArchPath = "";
 		String strIntPath = "";
 		FileInterface file = null;
@@ -361,8 +386,10 @@ public class FileConnector {
 				while (st.hasMoreTokens()) {
 					blFound = false;
 					str = "." + st.nextToken();
-					for (i = 0; i < SUPPORTEDFILES.length; ++i) {
-						String strFileExt = SUPPORTEDFILES[i].toLowerCase();
+					for (Iterator<String> iterator = SUPPORTED_FILE_TYPES
+							.keySet().iterator(); iterator.hasNext();) {
+						String strFileExt = iterator.next().toLowerCase();
+						type = SUPPORTED_FILE_TYPES.get(strFileExt);
 						if (str.startsWith(strFileExt)) {
 							blInArchive = false;
 							if (str.length() > strFileExt.length()
@@ -370,7 +397,7 @@ public class FileConnector {
 									&& str.charAt(strFileExt.length()) != '\\'
 									&& str.charAt(strFileExt.length()) != '/') {
 								iFirstIdx = -1;
-								iFirstFile = -1;
+								firstFileType = null;
 								iSecondIdx = -1;
 								// iSecondFile = -1;
 								strIntPath = "";
@@ -382,13 +409,13 @@ public class FileConnector {
 								blInArchive = true;
 							if (iFirstIdx != -1 && iSecondIdx == -1) {
 								DataContainer dc = new DataContainer();
-								dc.i = i;
+								dc.type = type;
 								dc.iIdx = iIdx;
 								dc.str = str;
 								dc.strExt = strFileExt;
 								dc.st = st;
 								if (!isLastExtention(dc, strCurPathLow)) {
-									i = dc.i;
+									type = dc.type;
 									iIdx = dc.iIdx;
 									str = dc.str;
 									st = dc.st;
@@ -397,18 +424,19 @@ public class FileConnector {
 								iSecondIdx = iIdx;
 							} else if (iFirstIdx == -1) {
 								DataContainer dc = new DataContainer();
-								dc.i = i;
+								dc.type = type;
 								dc.iIdx = iIdx;
 								dc.str = str;
 								dc.strExt = strFileExt;
 								dc.st = st;
 								if (!isLastExtention(dc, strCurPathLow)) {
-									i = dc.i;
+									type = dc.type;
 									iIdx = dc.iIdx;
 									str = dc.str;
 									st = dc.st;
 								}
-								iFirstFile = i;
+								firstFileType = SUPPORTED_FILE_TYPES
+										.get(strFileExt);
 								iFirstIdx = iIdx;
 							}
 							blFound = true;
@@ -419,7 +447,7 @@ public class FileConnector {
 				}
 				if (!blFound && !blInArchive) {
 					iFirstIdx = -1;
-					iFirstFile = -1;
+					firstFileType = null;
 					iSecondIdx = -1;
 					// iSecondFile = -1;
 					strIntPath = "";
@@ -439,18 +467,20 @@ public class FileConnector {
 			 * blFound = true; } if( blFound) i = 0; }
 			 */
 			if (blExtract && iSecondIdx != -1 && iFirstIdx != -1) {
-				strArchPath = strCurPath.substring(0, iFirstIdx
-						+ SUPPORTEDFILES[iFirstFile].length());
+				strArchPath = strCurPath
+						.substring(0, iFirstIdx
+								+ SUPPORTED_FILE_EXTENTIONS.get(firstFileType)
+										.length());
 				if (strCurPath.length() > iFirstIdx
-						+ SUPPORTEDFILES[iFirstFile].length())
+						+ SUPPORTED_FILE_EXTENTIONS.get(firstFileType).length())
 					strIntPath = strCurPath.substring(iFirstIdx
-							+ SUPPORTEDFILES[iFirstFile].length() + 1,
-							strCurPath.length());
+							+ SUPPORTED_FILE_EXTENTIONS.get(firstFileType)
+									.length() + 1, strCurPath.length());
 				strCurPath = FileConnector.extractToTempDir(strArchPath,
 						strIntPath, strParentPath, fic);
 				if (strCurPath != null) {
 					iFirstIdx = -1;
-					iFirstFile = -1;
+					firstFileType = null;
 					iSecondIdx = -1;
 					// iSecondFile = -1;
 					strIntPath = "";
@@ -468,9 +498,11 @@ public class FileConnector {
 						while (st.hasMoreTokens()) {
 							blFound = false;
 							str = "." + st.nextToken();
-							for (i = 0; i < SUPPORTEDFILES.length; ++i) {
-								String strFileExt = SUPPORTEDFILES[i]
+							for (Iterator<String> iterator = SUPPORTED_FILE_TYPES
+									.keySet().iterator(); iterator.hasNext();) {
+								String strFileExt = iterator.next()
 										.toLowerCase();
+								type = SUPPORTED_FILE_TYPES.get(strFileExt);
 								if (str.startsWith(strFileExt)) {
 									blInArchive = false;
 									if (str.length() > strFileExt.length()
@@ -478,7 +510,7 @@ public class FileConnector {
 											&& str.charAt(strFileExt.length()) != '\\'
 											&& str.charAt(strFileExt.length()) != '/') {
 										iFirstIdx = -1;
-										iFirstFile = -1;
+										firstFileType = null;
 										iSecondIdx = -1;
 										// iSecondFile = -1;
 										strIntPath = "";
@@ -491,13 +523,13 @@ public class FileConnector {
 										blInArchive = true;
 									if (iFirstIdx != -1 && iSecondIdx == -1) {
 										DataContainer dc = new DataContainer();
-										dc.i = i;
+										dc.type = type;
 										dc.iIdx = iIdx;
 										dc.str = str;
 										dc.strExt = strFileExt;
 										dc.st = st;
 										if (!isLastExtention(dc, strCurPathLow)) {
-											i = dc.i;
+											type = dc.type;
 											iIdx = dc.iIdx;
 											str = dc.str;
 											st = dc.st;
@@ -506,18 +538,18 @@ public class FileConnector {
 										iSecondIdx = iIdx;
 									} else if (iFirstIdx == -1) {
 										DataContainer dc = new DataContainer();
-										dc.i = i;
+										dc.type = SUPPORTED_FILE_TYPES.get(strFileExt);
 										dc.iIdx = iIdx;
 										dc.str = str;
 										dc.strExt = strFileExt;
 										dc.st = st;
 										if (!isLastExtention(dc, strCurPathLow)) {
-											i = dc.i;
+											type = dc.type;
 											iIdx = dc.iIdx;
 											str = dc.str;
 											st = dc.st;
 										}
-										iFirstFile = i;
+										firstFileType = SUPPORTED_FILE_TYPES.get(strFileExt);
 										iFirstIdx = iIdx;
 									}
 									blFound = true;
@@ -528,7 +560,7 @@ public class FileConnector {
 						}
 						if (!blFound && !blInArchive) {
 							iFirstIdx = -1;
-							iFirstFile = -1;
+							firstFileType = null;
 							iSecondIdx = -1;
 							// iSecondFile = -1;
 							strIntPath = "";
@@ -553,28 +585,28 @@ public class FileConnector {
 			}
 			if (iFirstIdx != -1) {
 				strArchPath = strCurPath.substring(0, iFirstIdx
-						+ SUPPORTEDFILES[iFirstFile].length());
+						+ SUPPORTED_FILE_EXTENTIONS.get(firstFileType).length());
 				if (strCurPath.length() > iFirstIdx
-						+ SUPPORTEDFILES[iFirstFile].length())
+						+ SUPPORTED_FILE_EXTENTIONS.get(firstFileType).length())
 					strIntPath = strCurPath.substring(iFirstIdx
-							+ SUPPORTEDFILES[iFirstFile].length() + 1,
+							+ SUPPORTED_FILE_EXTENTIONS.get(firstFileType).length() + 1,
 							strCurPath.length());
 			}
 			// if( !blExtract && strIntPath.equals( ""))
 			// iFirstFile = -1;
 		} else {
 			if (fic instanceof FtpTypeFileInterfaceConfiguration)
-				iFirstFile = 50;
+				firstFileType = FtpTypeFile.class;
 			if (fic instanceof CgiTypeFileInterfaceConfiguration)
-				iFirstFile = 51;
+				firstFileType = CgiTypeFile.class;
 			if (fic instanceof SocketTypeFileInterfaceConfiguration)
-				iFirstFile = 52;
+				firstFileType = SocketTypeFile.class;
 			if (fic instanceof CommPortTypeFileInterfaceConfiguration)
-				iFirstFile = 53;
+				firstFileType = CommPortTypeFile.class;
 		}
 
 		try {
-			file = getFile(iFirstFile, strCurPath, strArchPath, strIntPath,
+			file = getFile(firstFileType, strCurPath, strArchPath, strIntPath,
 					strParentPath, fic);
 		} catch (IOException ioex) {
 			ioex.printStackTrace();
@@ -582,17 +614,10 @@ public class FileConnector {
 		return file;
 	}
 
-	public static int getSupportetFileIndex(String str) {
-		int iRet = -1;
+	public static Class<? extends FileInterface> getSupportetFileType(String str) {
 		str = str.toLowerCase();
-		for (int i = 0; i < SUPPORTEDFILES.length; ++i) {
-			String strFileExt = SUPPORTEDFILES[i].toLowerCase();
-			if (str.equals(strFileExt)) {
-				iRet = i;
-				break;
-			}
-		}
-		return iRet;
+		Class<? extends FileInterface> result = SUPPORTED_FILE_TYPES.get(str);
+		return result;
 	}
 
 	protected static boolean isLastExtention(DataContainer dc,
@@ -605,15 +630,16 @@ public class FileConnector {
 			int iIdxFin = dc.iIdx + dc.strExt.length();
 			if (iIdxFin < strCurPathLow.length()) {
 				strTmp = strCurPathLow.substring(iIdxFin);
-				for (int ii = 0; ii < SUPPORTEDFILES.length; ++ii) {
-					String strFileExt2 = SUPPORTEDFILES[ii].toLowerCase();
+				for (Iterator<String> iterator = SUPPORTED_FILE_TYPES.keySet()
+						.iterator(); iterator.hasNext();) {
+					String strFileExt2 = iterator.next().toLowerCase();
 					if (strTmp.startsWith(strFileExt2)) {
 						blFound = true;
 						blRet = false;
 						dc.iIdx = iIdxFin;
 						if (dc.st.hasMoreTokens()) {
 							// ++dc.i;
-							dc.i = ii;
+							dc.type = SUPPORTED_FILE_TYPES.get(strFileExt2);
 							dc.str = "." + dc.st.nextToken();
 						}
 						break;
@@ -631,35 +657,7 @@ public class FileConnector {
 	 *            : FileInterface
 	 */
 	public static FileInterface createFileInterface(FileInterface fi) {
-		FileInterface fiNew = null;
-		if (fi instanceof NormalFile)
-			fiNew = (NormalFile) fi;
-		else if (fi instanceof JarTypeFile)
-			fiNew = (JarTypeFile) fi;
-		else if (fi instanceof TarTypeFile)
-			fiNew = (TarTypeFile) fi;
-		else if (fi instanceof GZipTypeFile)
-			fiNew = (GZipTypeFile) fi;
-		else if (fi instanceof BZip2TypeFile)
-			fiNew = (BZip2TypeFile) fi;
-		else if (fi instanceof ZipTypeFile)
-			fiNew = (ZipTypeFile) fi;
-		else if (fi instanceof ArjTypeFile)
-			fiNew = (ArjTypeFile) fi;
-		else if (fi instanceof ArTypeFile)
-			fiNew = (ArTypeFile) fi;
-		else if (fi instanceof XZTypeFile)
-			fiNew = (XZTypeFile) fi;
-		else if (fi instanceof ZTypeFile)
-			fiNew = (ZTypeFile) fi;
-		else if (fi instanceof FtpTypeFile)
-			fiNew = (FtpTypeFile) fi;
-		else if (fi instanceof CgiTypeFile)
-			fiNew = (CgiTypeFile) fi;
-		else if (fi instanceof SocketTypeFile)
-			fiNew = (SocketTypeFile) fi;
-		else if (fi instanceof CommPortTypeFile)
-			fiNew = (CommPortTypeFile) fi;
+		FileInterface fiNew = fi.duplicate();
 		return fiNew;
 	}
 
@@ -667,101 +665,46 @@ public class FileConnector {
 			int iSize) {
 		FileInterface[] fis = null;
 
-		if (fi instanceof NormalFile)
-			fis = new NormalFile[iSize];
-		else if (fi instanceof JarTypeFile)
-			fis = new JarTypeFile[iSize];
-		else if (fi instanceof TarTypeFile)
-			fis = new TarTypeFile[iSize];
-		else if (fi instanceof GZipTypeFile)
-			fis = new GZipTypeFile[iSize];
-		else if (fi instanceof BZip2TypeFile)
-			fis = new BZip2TypeFile[iSize];
-		else if (fi instanceof ZipTypeFile)
-			fis = new ZipTypeFile[iSize];
-		else if (fi instanceof ArjTypeFile)
-			fis = new ArjTypeFile[iSize];
-		else if (fi instanceof ArTypeFile)
-			fis = new ArTypeFile[iSize];
-		else if (fi instanceof XZTypeFile)
-			fis = new XZTypeFile[iSize];
-		else if (fi instanceof ZTypeFile)
-			fis = new ZTypeFile[iSize];
-		else if (fi instanceof FtpTypeFile)
-			fis = new FtpTypeFile[iSize];
-		else if (fi instanceof CgiTypeFile)
-			fis = new CgiTypeFile[iSize];
-		else if (fi instanceof SocketTypeFile)
-			fis = new SocketTypeFile[iSize];
-		else if (fi instanceof CommPortTypeFile)
-			fis = new CommPortTypeFile[iSize];
+		fis = (FileInterface[]) Array.newInstance(fi.getClass(), iSize);
 
 		return fis;
 	}
 
-	static private FileInterface getFile(int idx, String strCurPath,
-			String strArchPath, String strIntPath, String strParentPath,
-			FileInterfaceConfiguration fic) throws IOException {
+	static private FileInterface getFile(Class<? extends FileInterface> fiType,
+			String strCurPath, String strArchPath, String strIntPath,
+			String strParentPath, FileInterfaceConfiguration fic)
+			throws IOException {
 		FileInterface file = null;
-		switch (idx) {
-		case 0:
-			file = new ArjTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 1:
-			file = new ArTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 2:
-			file = new ZipTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 3:
-			file = new JarTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 4:
-			file = new TarTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 5:
-			file = new XZTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 6:
-			file = new ZTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 7:
-		case 8:
-			file = new GZipTypeFile(strArchPath, strIntPath, strParentPath, fic);
-			break;
-
-		case 9:
-		case 10:
-			file = new BZip2TypeFile(strArchPath, strIntPath, strParentPath,
-					fic);
-			break;
-
-		case 50:
-			file = new FtpTypeFile(strCurPath, strParentPath, null, fic);
-			break;
-
-		case 51:
-			file = new CgiTypeFile(strCurPath, strParentPath, fic);
-			break;
-
-		case 52:
-			file = new SocketTypeFile(strCurPath, strParentPath, fic);
-			break;
-
-		case 53:
-			file = new CommPortTypeFile(strCurPath, strParentPath, fic);
-			break;
-
-		default:
-			file = new NormalFile(strCurPath, strParentPath, fic);
-			break;
+		if (CompressTypeFile.class.isAssignableFrom(fiType)) {
+			Class<?>[] parameterTypes = { String.class, String.class,
+					FileInterfaceConfiguration.class };
+			file = (FileInterface) ReflectionUtil
+					.newInstance(fiType, parameterTypes, strArchPath,
+							strIntPath, strParentPath, fic);
+		} else if (FtpTypeFile.class.isAssignableFrom(fiType)) {
+			Class<?>[] parameterTypes = { String.class, String.class,
+					CoFile.class, FileInterfaceConfiguration.class };
+			file = (FileInterface) ReflectionUtil.newInstance(fiType,
+					parameterTypes, strCurPath, strParentPath, null, fic);
+		} else if (DuFile.class.isAssignableFrom(fiType)) {
+			Class<?>[] parameterTypes = { String.class, String.class,
+					FileInterfaceConfiguration.class };
+			file = (FileInterface) ReflectionUtil
+					.newInstance(fiType, parameterTypes, strArchPath,
+							strIntPath, strParentPath, fic);
+		} else if (ClientTypeFile.class.isAssignableFrom(fiType)) {
+			Class<?>[] parameterTypes = { String.class, String.class,
+					FileInterfaceConfiguration.class };
+			file = (FileInterface) ReflectionUtil
+					.newInstance(fiType, parameterTypes, strArchPath,
+							strIntPath, strParentPath, fic);
+		} else {
+			// NormalFile
+			Class<?>[] parameterTypes = { String.class, String.class,
+					FileInterfaceConfiguration.class };
+			file = (FileInterface) ReflectionUtil
+					.newInstance(fiType, parameterTypes, strArchPath,
+							strIntPath, strParentPath, fic);
 		}
 		return file;
 	}

@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -82,7 +82,6 @@ public class FtpTypeFile implements FileInterface {
 	protected String m_ftpPath;
 	protected String m_intPath;
 	protected String m_parentPath;
-	protected Vector m_ftpEntries = new Vector();
 	protected String m_curFtpEntry;
 	protected Process m_procCurrent = null;
 
@@ -235,12 +234,12 @@ public class FtpTypeFile implements FileInterface {
 	}
 
 	public String getTempDirectory() {
-		String strTmpDir = FileConnector.TempDirectory;
+		String strTmpDir = FileConnector.getTempDirectory();
 		if (strTmpDir == null) {
 			strTmpDir = new File(".").getAbsolutePath();
 			if (strTmpDir == null)
 				strTmpDir = "";
-			FileConnector.TempDirectory = strTmpDir;
+			FileConnector.setTempDirectory(strTmpDir);
 		} else {
 			int idx = strTmpDir.lastIndexOf(separatorChar());
 			if (idx > 0 && idx == strTmpDir.length() - 1)
@@ -492,7 +491,7 @@ public class FtpTypeFile implements FileInterface {
 	public FileInterface[] _listFiles(FileInterfaceFilter filter) {
 		if (!isCached() || m_fiList == null) {
 			FtpTypeFile[] ftps = new FtpTypeFile[0];
-			Vector vec = null;
+			List<FtpTypeFile> vec = null;
 			m_fiList = (haui.io.FileInterface.FileInterface[]) ftps;
 			if (isDirectory() || (m_curFtpEntry == null && isArchive())) {
 				CoFile[] files = ftpFile.listCoFiles();
@@ -501,7 +500,7 @@ public class FtpTypeFile implements FileInterface {
 						if (filter == null)
 							ftps = new FtpTypeFile[Array.getLength(files)];
 						else
-							vec = new Vector();
+							vec = new ArrayList<>();
 						for (int j = 0; j < Array.getLength(files); ++j) {
 							// ftps[j] = new FtpTypeFile(
 							// files[j].getAbsolutePath(), m_ftpPath, m_ftpObj);
@@ -522,7 +521,7 @@ public class FtpTypeFile implements FileInterface {
 						if (filter != null) {
 							ftps = new FtpTypeFile[vec.size()];
 							for (int j = 0; j < vec.size(); ++j)
-								ftps[j] = (FtpTypeFile) vec.elementAt(j);
+								ftps[j] = (FtpTypeFile) vec.get(j);
 						}
 						m_fiList = (haui.io.FileInterface.FileInterface[]) ftps;
 					}

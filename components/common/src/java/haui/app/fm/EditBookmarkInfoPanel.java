@@ -5,7 +5,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -41,8 +41,8 @@ public class EditBookmarkInfoPanel extends JPanel
   private static final long serialVersionUID = -2046551931257845877L;
   
   Component m_frame = null;
-  Vector m_bookmarks;
-  DefaultListModel m_dlm = new DefaultListModel();
+  List<BookmarkInfo> m_bookmarks;
+  DefaultListModel<BookmarkInfo> m_dlm = new DefaultListModel<>();
   BorderLayout m_borderLayoutBase = new BorderLayout();
   BorderLayout m_borderLayoutList = new BorderLayout();
   FlowLayout m_flowLayoutListButton = new FlowLayout();
@@ -50,11 +50,11 @@ public class EditBookmarkInfoPanel extends JPanel
   JPanel m_jPanelList = new JPanel();
   JScrollPane m_jScrollPaneList = new JScrollPane();
   JPanel m_jPanelListButton = new JPanel();
-  JList m_jListBookmarks = new JList();
+  JList<BookmarkInfo> m_jListBookmarks = new JList<>();
   JButton m_jButtonUp = new JButton();
   JButton m_jButtonDown = new JButton();
 
-  public EditBookmarkInfoPanel( Component frame, Vector bookmarks)
+  public EditBookmarkInfoPanel( Component frame, List<BookmarkInfo> bookmarks)
   {
     m_frame = frame;
     try
@@ -83,7 +83,7 @@ public class EditBookmarkInfoPanel extends JPanel
     m_frame = frame;
   }
 
-  public void setBookmarkVector( Vector bookmarks)
+  public void setBookmarkVector( List<BookmarkInfo> bookmarks)
   {
     m_bookmarks = bookmarks;
 
@@ -91,7 +91,7 @@ public class EditBookmarkInfoPanel extends JPanel
     {
       for( int i = 0; i < m_bookmarks.size(); i++)
       {
-        m_dlm.addElement( (BookmarkInfo)m_bookmarks.elementAt(i));
+        m_dlm.addElement( m_bookmarks.get(i));
         m_jListBookmarks.setSelectedIndex( 0);
       }
     }
@@ -140,9 +140,9 @@ public class EditBookmarkInfoPanel extends JPanel
 
     if( idx > 0)
     {
-      BookmarkInfo bookmarkprev = (BookmarkInfo)m_bookmarks.elementAt( idx-1);
-      m_bookmarks.setElementAt( bookmarkprev, idx);
-      m_bookmarks.setElementAt( bookmark, idx-1);
+      BookmarkInfo bookmarkprev = m_bookmarks.get( idx-1);
+      m_bookmarks.set(idx, bookmarkprev);
+      m_bookmarks.set(idx-1, bookmark);
       m_dlm.setElementAt( bookmarkprev, idx);
       m_dlm.setElementAt( bookmark, idx-1);
       m_jListBookmarks.setSelectedIndex( idx-1);
@@ -158,9 +158,9 @@ public class EditBookmarkInfoPanel extends JPanel
 
     if( idx+1 < m_bookmarks.size())
     {
-      BookmarkInfo bookmarknext = (BookmarkInfo)m_bookmarks.elementAt( idx+1);
-      m_bookmarks.setElementAt( bookmarknext, idx);
-      m_bookmarks.setElementAt( bookmark, idx+1);
+      BookmarkInfo bookmarknext = (BookmarkInfo)m_bookmarks.get( idx+1);
+      m_bookmarks.set(idx, bookmarknext);
+      m_bookmarks.set(idx+1, bookmark);
       m_dlm.setElementAt( bookmarknext, idx);
       m_dlm.setElementAt( bookmark, idx+1);
       m_jListBookmarks.setSelectedIndex( idx+1);
@@ -178,7 +178,7 @@ public class EditBookmarkInfoPanel extends JPanel
       m_jListBookmarks.setSelectedIndex( 0);
   }
 
-  public Vector getBookmark()
+  public List<BookmarkInfo> getBookmark()
   {
     return m_bookmarks;
   }

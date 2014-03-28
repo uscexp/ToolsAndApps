@@ -2,8 +2,8 @@ package haui.app.fm;
 
 import haui.util.AppProperties;
 import haui.util.CommandClass;
-import java.lang.String;
-import java.util.Vector;
+
+import java.util.List;
 
 /**
  * Module:					FipConnection.java<br> $Source: M:\\Dev\\source\\RCS\\M\\Dev\\source\\Bean\\ToolKit2\\haui\\app\\fm\\FipConnection.java,v $ <p> Description:    Contains the connection configuration.<br> </p><p> Created:				17.11.2000	by	AE </p><p>
@@ -24,8 +24,8 @@ extends Object
   AppProperties m_appProps;
   String m_strAppName;
   String m_strConnName;
-  Vector m_vecButCmd;
-  Vector m_vecFileExtCmd;
+  List<CommandClass> m_vecButCmd;
+  List<CommandClass> m_vecFileExtCmd;
 
   public FipConnection( String strName, String strAppName, AppProperties appProps)
   {
@@ -79,22 +79,22 @@ extends Object
     m_strConnName = strName;
   }
 
-  public Vector getButtonCommands()
+  public List<CommandClass> getButtonCommands()
   {
     return m_vecButCmd;
   }
 
-  public void setButtonCommands( Vector vecButCmd)
+  public void setButtonCommands( List<CommandClass> vecButCmd)
   {
     m_vecButCmd = vecButCmd;
   }
 
-  public Vector getFileExtCommands()
+  public List<CommandClass> getFileExtCommands()
   {
     return m_vecFileExtCmd;
   }
 
-  public void setFileExtCommands( Vector vecFileExtCmd)
+  public void setFileExtCommands( List<CommandClass> vecFileExtCmd)
   {
     m_vecFileExtCmd = vecFileExtCmd;
   }

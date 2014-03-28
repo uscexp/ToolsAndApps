@@ -113,12 +113,12 @@ public abstract class BaseTypeFile implements FileInterface {
 	}
 
 	public String getTempDirectory() {
-		String strTmpDir = FileConnector.TempDirectory;
+		String strTmpDir = FileConnector.getTempDirectory();
 		if (strTmpDir == null) {
 			strTmpDir = new File(".").getAbsolutePath();
 			if (strTmpDir == null)
 				strTmpDir = "";
-			FileConnector.TempDirectory = strTmpDir;
+			FileConnector.setTempDirectory(strTmpDir);
 		} else {
 			int idx = strTmpDir.lastIndexOf(separatorChar());
 			if (idx > 0 && idx == strTmpDir.length() - 1)

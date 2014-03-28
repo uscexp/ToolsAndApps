@@ -1,5 +1,7 @@
 package haui.io;
 
+import haui.io.FileInterface.FileInterface;
+
 import java.util.StringTokenizer;
 
 /**
@@ -25,7 +27,7 @@ import java.util.StringTokenizer;
  */
 public class DataContainer
 {
-  public int i;
+  public Class<? extends FileInterface> type;
   public int iIdx;
   public String str;
   public String strExt;

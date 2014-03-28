@@ -11,7 +11,6 @@ import haui.util.GlobalApplicationContext;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,30 +141,6 @@ public abstract class ClientTypeFile extends BaseTypeFile {
 
 	public AppProperties getAppProperties() {
 		return getFileInterfaceConfiguration().getAppProperties();
-	}
-
-	public String getTempDirectory() {
-		/*
-		 * sendRequestObject( new RemoteRequestObject( "getTempDirectory"));
-		 * RemoteResponseObject response = readResponseObject(); String strRet =
-		 * null;
-		 * 
-		 * if( response != null) strRet = (String)response.getObject();
-		 * 
-		 * return strRet;
-		 */
-		String strTmpDir = FileConnector.TempDirectory;
-		if (strTmpDir == null) {
-			strTmpDir = new File(".").getAbsolutePath();
-			if (strTmpDir == null)
-				strTmpDir = "";
-			FileConnector.TempDirectory = strTmpDir;
-		} else {
-			int idx = strTmpDir.lastIndexOf(separatorChar());
-			if (idx > 0 && idx == strTmpDir.length() - 1)
-				strTmpDir = strTmpDir.substring(0, strTmpDir.length() - 1);
-		}
-		return strTmpDir;
 	}
 
 	public BufferedInputStream getBufferedInputStream()
@@ -410,7 +385,7 @@ public abstract class ClientTypeFile extends BaseTypeFile {
 	}
 
 	public void setName(String strName) {
-		strName = strName;
+		this.name = strName;
 	}
 
 	public String getAbsolutePath() {

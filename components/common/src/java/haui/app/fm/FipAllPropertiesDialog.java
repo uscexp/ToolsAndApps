@@ -6,8 +6,10 @@ import haui.components.TextInputDialog;
 import haui.io.FileInterface.FileInterface;
 import haui.resource.ResouceManager;
 import haui.util.AppProperties;
+import haui.util.CommandClass;
 import haui.util.ConfigPathUtil;
 import haui.util.GlobalApplicationContext;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -20,7 +22,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -46,9 +50,9 @@ public class FipAllPropertiesDialog
   // member variables
   AppProperties m_appProps;
   boolean m_blCanceled = false;
-  Vector m_vecFileCmd = new Vector();
+  List<CommandClass> m_vecFileCmd = new ArrayList<>();
   FipConnection m_fipc;
-  Vector m_vecFipConns = new Vector();
+  List<FipConnection> m_vecFipConns = new ArrayList<>();
 
   // GUI member variables
   JPanel m_jPanelBase = new JPanel();
@@ -65,8 +69,8 @@ public class FipAllPropertiesDialog
   JPanel m_jPanelLeft = new JPanel();
   FipPropertiesPanel m_jPanelFip = new FipPropertiesPanel();
   JScrollPane m_jScrollPaneCmd = new JScrollPane();
-  JList m_jListCmd = new JList();
-  DefaultListModel m_dlm = new DefaultListModel();
+  JList<String> m_jListCmd = new JList<>();
+  DefaultListModel<String> m_dlm = new DefaultListModel<>();
   JToolBar m_jToolBarFip = new JToolBar();
   JButton m_jButtonRename = new JButton();
   JButton m_jButtonDelete = new JButton();
@@ -306,7 +310,7 @@ public class FipAllPropertiesDialog
     String strHeader = "Connection, FileExt and Button command properties";
     for( int i = 0; i < m_vecFipConns.size(); ++i)
     {
-      FipConnection fip = (FipConnection)m_vecFipConns.elementAt( i);
+      FipConnection fip = m_vecFipConns.get( i);
       fip._save();
       AppProperties fipProps = fip.getAppProperties();
       fipProps.remove( GlobalApplicationContext.LOGONPASSWORD);
@@ -359,7 +363,7 @@ public class FipAllPropertiesDialog
     }
     for( int i = 0; i < m_vecFipConns.size(); ++i)
     {
-      FipConnection fip = (FipConnection)m_vecFipConns.elementAt( i);
+      FipConnection fip = m_vecFipConns.get( i);
       if( fip.getName().equals( strFileName))
       {
         m_fipc = fip;
@@ -381,10 +385,10 @@ public class FipAllPropertiesDialog
         boolean blFound = false;
         for( int i = 0; i < m_vecFipConns.size(); ++i)
         {
-          FipConnection fipcTmp = ( FipConnection)m_vecFipConns.elementAt( i);
+          FipConnection fipcTmp = m_vecFipConns.get( i);
           if( fipcTmp.getName().equals( m_fipc.getName()))
           {
-            m_vecFipConns.setElementAt( m_fipc, i );
+            m_vecFipConns.set(i, m_fipc);
             blFound = true;
             break;
           }
@@ -420,12 +424,12 @@ public class FipAllPropertiesDialog
     m_jPanelCoCmd.showAfterFileEx();
   }
 
-  public void setCommandVector( Vector cmd)
+  public void setCommandVector( List<CommandClass> cmd)
   {
     m_jPanelCoCmd.setCommandVector( cmd);
   }
 
-  public Vector getCommand()
+  public List<CommandClass> getCommand()
   {
     return m_jPanelCoCmd.getCommand();
   }
@@ -506,13 +510,13 @@ public class FipAllPropertiesDialog
         //boolean blFound = false;
         for( int i = 0; i < m_vecFipConns.size(); ++i)
         {
-          FipConnection fipcTmp = ( FipConnection)m_vecFipConns.elementAt( i);
+          FipConnection fipcTmp = m_vecFipConns.get( i);
           if( fipcTmp.getName().equals( strOldName))
           {
             int iIdx = i;
             for( i = 0; i < m_vecFipConns.size(); ++i)
             {
-              fipcTmp = ( FipConnection )m_vecFipConns.elementAt( i );
+              fipcTmp = m_vecFipConns.get( i );
               if( fipcTmp.getName().equals( strFileName ) )
               {
                 int iRet;
@@ -535,7 +539,7 @@ public class FipAllPropertiesDialog
             }
             m_fipc.m_strConnName = strFileName;
             m_fipc._init();
-            m_vecFipConns.setElementAt( m_fipc, iIdx );
+            m_vecFipConns.set(iIdx, m_fipc);
             break;
           }
         }
@@ -576,7 +580,7 @@ public class FipAllPropertiesDialog
         boolean blFound = false;
         for( int i = 0; i < m_vecFipConns.size(); ++i)
         {
-          FipConnection fipcTmp = ( FipConnection)m_vecFipConns.elementAt( i);
+          FipConnection fipcTmp = m_vecFipConns.get( i);
           if( fipcTmp.getName().equals( strFileName))
           {
             int iRet;
@@ -584,7 +588,7 @@ public class FipAllPropertiesDialog
               JOptionPane.QUESTION_MESSAGE);
             if( iRet == JOptionPane.YES_OPTION)
             {
-              m_vecFipConns.setElementAt( m_fipc, i );
+              m_vecFipConns.set(i, m_fipc);
             }
             else
             {
@@ -639,10 +643,10 @@ public class FipAllPropertiesDialog
         file.delete();
         for( int i = 0; i < m_vecFipConns.size(); ++i)
         {
-          FipConnection fip = ( FipConnection )m_vecFipConns.elementAt( i );
+          FipConnection fip = m_vecFipConns.get( i );
           if( fip.getName().equalsIgnoreCase( strFileName))
           {
-            m_vecFipConns.removeElementAt( i);
+            m_vecFipConns.remove( i);
           }
         }
         strFileName = (String)m_jListCmd.getSelectedValue();
@@ -650,7 +654,7 @@ public class FipAllPropertiesDialog
         {
           for( int i = 0; i < m_vecFipConns.size(); ++i)
           {
-            FipConnection fip = ( FipConnection )m_vecFipConns.elementAt( i );
+            FipConnection fip = m_vecFipConns.get( i );
             if( fip.getName().equalsIgnoreCase( strFileName))
             {
               m_appProps = fip.getAppProperties();

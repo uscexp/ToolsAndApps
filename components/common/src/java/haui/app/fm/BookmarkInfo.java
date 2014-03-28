@@ -2,7 +2,8 @@ package haui.app.fm;
 
 import haui.util.AppProperties;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *		Module:					BookmarkInfo.java<br>
@@ -104,12 +105,12 @@ public class BookmarkInfo
     }
   }
 
-  static public Vector initBookmarkVector( String strPrefix, AppProperties appProps)
+  static public List<BookmarkInfo> initBookmarkVector( String strPrefix, AppProperties appProps)
   {
     int i = 0;
     String strId;
     String strPar;
-    Vector vecBookmarks = new Vector();
+    List<BookmarkInfo> vecBookmarks = new ArrayList<>();
 
     for( i = 0; (strId = appProps.getProperty( strPrefix + String.valueOf( i) + "." + CONNECTIONID)) != null
       && (strPar = appProps.getProperty( strPrefix + String.valueOf( i) + "." + PATH)) != null;
@@ -121,11 +122,11 @@ public class BookmarkInfo
     return vecBookmarks;
   }
 
-  static public void storeBookmarks( String strPrefix, Vector vecBookmarks, AppProperties appProps)
+  static public void storeBookmarks( String strPrefix, List<BookmarkInfo> vecBookmarks, AppProperties appProps)
   {
     for( int i = 0; i < vecBookmarks.size(); i++)
     {
-      BookmarkInfo bi = (BookmarkInfo)vecBookmarks.elementAt( i);
+      BookmarkInfo bi = vecBookmarks.get( i);
       appProps.setProperty( strPrefix + String.valueOf( i) + "." + CONNECTIONID,
         bi.getConnectionId());
       appProps.setProperty( strPrefix + String.valueOf( i) + "." + PATH,
