@@ -1,59 +1,49 @@
-/* *****************************************************************
- * Project: common
- * File:    FtpTypeFileInterfaceConfiguration.java
+/**
  * 
- * Creation:     20.03.2006 by Andreas Eisenhauer
- * Modification: %date_modified: % %derived_by: %   
- * Version:      %version: %
- *
- * Copyright (C) 2006 Andreas Eisenhauer. All rights reserved! 
- * ****************************************************************/
+ */
 package haui.io.FileInterface.configuration;
 
-import cz.dhl.ftp.Ftp;
-import cz.dhl.ftp.FtpConnect;
+import haui.exception.AppSystemException;
+import haui.io.FileInterface.vfs.FtpConnectionObject;
 import haui.util.AppProperties;
 
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.auth.StaticUserAuthenticator;
+import org.apache.commons.vfs2.impl.DefaultFileSystemConfigBuilder;
+import org.apache.commons.vfs2.provider.ftp.FtpFileSystemConfigBuilder;
+
 /**
- * Module:      FtpTypeFileInterfaceConfiguration<br> <p> Description: FtpTypeFileInterfaceConfiguration<br> </p><p> Created:     20.03.2006 by Andreas Eisenhauer </p><p>
- * @history      20.03.2006 by AE: Created.<br>  </p><p>
- * @author       <a href="mailto:andreas.eisenhauer@haui.cjb.net">Andreas Eisenhauer</a>  </p><p>
- * @version      v0.1, 2006; %version: %<br>  </p><p>
- * @since        JDK1.4  </p>
+ * Configuration for FTP type file.
+ * 
+ * @author ae
+ * 
  */
-public class FtpTypeFileInterfaceConfiguration extends FileInterfaceConfiguration
-{
+public class FtpTypeFileInterfaceConfiguration extends VfsTypeFileInterfaceConfiguration {
 
-  protected Ftp m_ftpObj = null;
-  
-  public FtpTypeFileInterfaceConfiguration( Ftp obj, String appName, AppProperties props, boolean cached)
-  {
-    super( appName, props, cached);
-    m_ftpObj = obj;
-  }
+    /** protokoll://hostname[: port][ relative-path] */
+    public static final String URI_FORMAT = "%s%s:%d/%s";
 
-  public Ftp getFtpObj()
-  {
-    return m_ftpObj;
-  }
+    protected FtpConnectionObject connectionObject;
 
-  public void setFtpObj( Ftp obj)
-  {
-    m_ftpObj = obj;
-  }
+    public FtpTypeFileInterfaceConfiguration(String appName, AppProperties props, boolean cached, FtpConnectionObject connectionObject) {
+        super(appName, props, cached);
+        this.connectionObject = connectionObject;
+        StaticUserAuthenticator userAuthenticator = new StaticUserAuthenticator(connectionObject.getHost(), connectionObject.getUsr(), connectionObject.getPwd());
+        try {
+            DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(fileSystemOptions, userAuthenticator);
+            FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(fileSystemOptions, false);
+            FtpFileSystemConfigBuilder.getInstance().setDataTimeout(fileSystemOptions, 10000);
+            FtpFileSystemConfigBuilder.getInstance().setSoTimeout(fileSystemOptions, 10000);
+        } catch (FileSystemException e) {
+            throw new AppSystemException(e);
+        }
+    }
 
-  public boolean isLocal()
-  {
-    return false;
-  }
-  
-  public FtpConnect connect()
-  {
-    return getFtpObj().getConnect();
-  }
-  
-  public void disconnect()
-  {
-    getFtpObj().disconnect();
-  }
+    public String getUri(String path) {
+        return String.format(URI_FORMAT, connectionObject.getProtokoll().getUriPrefix(), connectionObject.getHost(), connectionObject.getPort(), path);
+    }
+
+    public FtpConnectionObject getConnectionObject() {
+        return connectionObject;
+    }
 }

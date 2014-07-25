@@ -79,350 +79,335 @@ import javax.swing.JDialog;
  *        </p>
  */
 public class NormalFile extends BaseTypeFile {
-	// constants
+    // constants
 
-	// member variables
-	private File file;
+    // member variables
+    private File file;
 
-	/**
-	 * Creates a new NormalFile instance.
-	 * 
-	 * @param strCurPath
-	 *            : current path
-	 */
-	public NormalFile(String strCurPath, String strParentPath,
-			FileInterfaceConfiguration fic) {
-		super(fic);
-		file = new File(strCurPath);
-		parent = strParentPath;
-		if (parent == null) {
-			if (file.getParentFile() != null)
-				parent = file.getParentFile().getAbsolutePath();
-			else {
-				if (parent == null) {
-					parent = getAbsolutePath();
-					int iIdx = -1;
-					if (parent.length() > 2) {
-						for (int i = parent.length() - 3; i >= 0; i--) {
-							char c = parent.charAt(i);
-							if (c == separatorChar()) {
-								iIdx = i + 1;
-								break;
-							}
-						}
-					}
-					if (iIdx == -1)
-						parent = null;
-					else
-						parent = parent.substring(0, iIdx);
-				}
-			}
-		}
-		super._init();
-	}
+    /**
+     * Creates a new NormalFile instance.
+     * 
+     * @param strCurPath
+     *            : current path
+     */
+    public NormalFile(String strCurPath, String strParentPath, FileInterfaceConfiguration fic) {
+        super(fic);
+        file = new File(strCurPath);
+        parent = strParentPath;
+        if (parent == null) {
+            if (file.getParentFile() != null)
+                parent = file.getParentFile().getAbsolutePath();
+            else {
+                if (parent == null) {
+                    parent = getAbsolutePath();
+                    int iIdx = -1;
+                    if (parent.length() > 2) {
+                        for (int i = parent.length() - 3; i >= 0; i--) {
+                            char c = parent.charAt(i);
+                            if (c == separatorChar()) {
+                                iIdx = i + 1;
+                                break;
+                            }
+                        }
+                    }
+                    if (iIdx == -1)
+                        parent = null;
+                    else
+                        parent = parent.substring(0, iIdx);
+                }
+            }
+        }
+        super._init();
+    }
 
-	public File getOriginalFile() {
-		return file;
-	}
-	
-	public FileInterface duplicate() {
-		NormalFile nf = new NormalFile(getAbsolutePath(), getParent(),
-				getFileInterfaceConfiguration());
-		return nf;
-	}
+    public File getOriginalFile() {
+        return file;
+    }
 
-	public BufferedInputStream getBufferedInputStream()
-			throws FileNotFoundException, IOException {
-		return new BufferedInputStream(new FileInputStream(getAbsolutePath()));
-	}
+    public FileInterface duplicate() {
+        NormalFile nf = new NormalFile(getAbsolutePath(), getParent(), getFileInterfaceConfiguration());
+        return nf;
+    }
 
-	public BufferedOutputStream getBufferedOutputStream(String strNewPath)
-			throws FileNotFoundException {
-		return new BufferedOutputStream(new FileOutputStream(strNewPath));
-	}
+    public BufferedInputStream getBufferedInputStream() throws FileNotFoundException, IOException {
+        return new BufferedInputStream(new FileInputStream(getAbsolutePath()));
+    }
 
-	public void closeOutputStream() throws IOException {
-	}
+    public BufferedOutputStream getBufferedOutputStream(String strNewPath) throws FileNotFoundException {
+        return new BufferedOutputStream(new FileOutputStream(strNewPath));
+    }
 
-	public FileInterface[] _listRoots() {
-		if (!isCached() || fileInterfaceRoots == null) {
-			File f[] = File.listRoots();
-			if (f == null)
-				return null;
+    public void closeOutputStream() throws IOException {
+    }
 
-			fileInterfaceRoots = new NormalFile[f.length];
-			for (int i = 0; i < f.length; ++i) {
-				fileInterfaceRoots[i] = new NormalFile(f[i].getAbsolutePath(),
-						f[i].getParent(), getFileInterfaceConfiguration());
-			}
-		}
-		return (FileInterface[]) fileInterfaceRoots;
-	}
+    public FileInterface[] _listRoots() {
+        if (!isCached() || fileInterfaceRoots == null) {
+            File f[] = File.listRoots();
+            if (f == null)
+                return null;
 
-	public char separatorChar() {
-		return File.separatorChar;
-	}
+            fileInterfaceRoots = new NormalFile[f.length];
+            for (int i = 0; i < f.length; ++i) {
+                fileInterfaceRoots[i] = new NormalFile(f[i].getAbsolutePath(), f[i].getParent(), getFileInterfaceConfiguration());
+            }
+        }
+        return (FileInterface[]) fileInterfaceRoots;
+    }
 
-	public char pathSeparatorChar() {
-		return File.pathSeparatorChar;
-	}
+    public char separatorChar() {
+        return File.separatorChar;
+    }
 
-	public boolean canRead() {
-		if (!isCached())
-			read = file.canRead();
-		return read;
-	}
+    public char pathSeparatorChar() {
+        return File.pathSeparatorChar;
+    }
 
-	public boolean canWrite() {
-		if (!isCached())
-			write = file.canWrite();
-		return write;
-	}
+    public boolean canRead() {
+        if (!isCached())
+            read = file.canRead();
+        return read;
+    }
 
-	public boolean isDirectory() {
-		if (!isCached())
-			directory = file.isDirectory();
-		return directory;
-	}
+    public boolean canWrite() {
+        if (!isCached())
+            write = file.canWrite();
+        return write;
+    }
 
-	public boolean isFile() {
-		if (!isCached())
-			fileType = file.isFile();
-		return fileType;
-	}
+    public boolean isDirectory() {
+        if (!isCached())
+            directory = file.isDirectory();
+        return directory;
+    }
 
-	public boolean isHidden() {
-		if (!isCached())
-			hidden = file.isHidden();
-		return hidden;
-	}
+    public boolean isFile() {
+        if (!isCached())
+            fileType = file.isFile();
+        return fileType;
+    }
 
-	public URL toURL() {
-		URL url = null;
-		try {
-			url = new URL("file", null, getAbsolutePath());
-		} catch (MalformedURLException ex) {
-			ex.printStackTrace();
-		}
-		return url;
-	}
+    public boolean isHidden() {
+        if (!isCached())
+            hidden = file.isHidden();
+        return hidden;
+    }
 
-	public long length() {
-		if (!isCached())
-			length = file.length();
-		return length;
-	}
+    public URL toURL() {
+        URL url = null;
+        try {
+            url = new URL("file", null, getAbsolutePath());
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        }
+        return url;
+    }
 
-	public String getId() {
-		return host;
-	}
+    public long length() {
+        if (!isCached())
+            length = file.length();
+        return length;
+    }
 
-	public String getName() {
-		if (!isCached() || name == null)
-			name = file.getName();
-		return name;
-	}
+    public String getId() {
+        return host;
+    }
 
-	public String getAbsolutePath() {
-		if (!isCached() || absolutePath == null)
-			absolutePath = file.getAbsolutePath();
-		return absolutePath;
-	}
+    public String getName() {
+        if (!isCached() || name == null)
+            name = file.getName();
+        return name;
+    }
 
-	public FileInterface getCanonicalFile() throws IOException {
-		return new NormalFile(file.getCanonicalPath(), getParent(),
-				getFileInterfaceConfiguration());
-	}
+    public String getAbsolutePath() {
+        if (!isCached() || absolutePath == null)
+            absolutePath = file.getAbsolutePath();
+        return absolutePath;
+    }
 
-	public String getPath() {
-		if (!isCached() || path == null)
-			path = file.getPath();
-		return path;
-	}
+    public FileInterface getCanonicalFile() throws IOException {
+        return new NormalFile(file.getCanonicalPath(), getParent(), getFileInterfaceConfiguration());
+    }
 
-	public String getInternalPath() {
-		return null;
-	}
+    public String getPath() {
+        if (!isCached() || path == null)
+            path = file.getPath();
+        return path;
+    }
 
-	public FileInterface getDirectAccessFileInterface() {
-		return this;
-	}
+    public String getInternalPath() {
+        return null;
+    }
 
-	public String getParent() {
-		if (parent != null && !parent.equals(""))
-			return parent;
-		return file.getParent();
-	}
+    public FileInterface getDirectAccessFileInterface() {
+        return this;
+    }
 
-	public FileInterface getParentFileInterface() {
-		boolean blExtract = false;
-		FileInterface fi = FileConnector.createFileInterface(getParent(), null,
-				blExtract, getFileInterfaceConfiguration());
-		return fi;
-	}
+    public String getParent() {
+        if (parent != null && !parent.equals(""))
+            return parent;
+        return file.getParent();
+    }
 
-	public long lastModified() {
-		if (!isCached())
-			modified = file.lastModified();
-		return modified;
-	}
+    public FileInterface getParentFileInterface() {
+        boolean blExtract = false;
+        FileInterface fi = FileConnector.createFileInterface(getParent(), null, blExtract, getFileInterfaceConfiguration());
+        return fi;
+    }
 
-	public boolean setLastModified(long time) {
-		return file.setLastModified(time);
-	}
+    public long lastModified() {
+        if (!isCached())
+            modified = file.lastModified();
+        return modified;
+    }
 
-	public String[] list() {
-		if (!isCached() || list == null)
-			list = file.list();
-		return list;
-	}
+    public boolean setLastModified(long time) {
+        return file.setLastModified(time);
+    }
 
-	public FileInterface[] _listFiles(FileInterfaceFilter filter) {
-		if (!isCached() || fileInterfaces == null) {
-			File[] f;
-			List<FileInterface> files = new ArrayList<FileInterface>();
-			if (filter == null) {
-				f = file.listFiles();
-				for (int i = 0; i < f.length; ++i) {
-					files.add(new NormalFile(f[i].getAbsolutePath(), f[i]
-							.getParent(), getFileInterfaceConfiguration()));
-				}
-			} else {
-				f = file.listFiles();
-				for (int i = 0; i < f.length; ++i) {
-					FileInterface file = new NormalFile(f[i].getAbsolutePath(),
-							f[i].getParent(), getFileInterfaceConfiguration());
-					if ((filter == null) || filter.accept(file))
-						files.add(file);
-				}
-			}
+    public String[] list() {
+        if (!isCached() || list == null)
+            list = file.list();
+        return list;
+    }
 
-			if (f == null)
-				return null;
+    public FileInterface[] _listFiles(FileInterfaceFilter filter) {
+        if (!isCached() || fileInterfaces == null) {
+            File[] f;
+            List<FileInterface> files = new ArrayList<FileInterface>();
+            if (filter == null) {
+                f = file.listFiles();
+                for (int i = 0; i < f.length; ++i) {
+                    files.add(new NormalFile(f[i].getAbsolutePath(), f[i].getParent(), getFileInterfaceConfiguration()));
+                }
+            } else {
+                f = file.listFiles();
+                for (int i = 0; i < f.length; ++i) {
+                    FileInterface file = new NormalFile(f[i].getAbsolutePath(), f[i].getParent(), getFileInterfaceConfiguration());
+                    if ((filter == null) || filter.accept(file))
+                        files.add(file);
+                }
+            }
 
-			fileInterfaces = (FileInterface[]) files
-					.toArray(new FileInterface[files.size()]);
-		}
-		return (FileInterface[]) fileInterfaces;
-	}
+            if (f == null)
+                return null;
 
-	public FileInterface[] _listFiles() {
-		return _listFiles(null);
-	}
+            fileInterfaces = (FileInterface[]) files.toArray(new FileInterface[files.size()]);
+        }
+        return (FileInterface[]) fileInterfaces;
+    }
 
-	public boolean renameTo(FileInterface file) {
-		boolean blRet = this.file.renameTo(((NormalFile) file).getOriginalFile());
-		if (blRet && isCached()) {
-			absolutePath = file.getAbsolutePath();
-			path = file.getPath();
-			name = file.getName();
-		}
-		return blRet;
-	}
+    public FileInterface[] _listFiles() {
+        return _listFiles(null);
+    }
 
-	public boolean delete() {
-		return file.delete();
-	}
+    public boolean renameTo(FileInterface file) {
+        boolean blRet = this.file.renameTo(((NormalFile) file).getOriginalFile());
+        if (blRet && isCached()) {
+            absolutePath = file.getAbsolutePath();
+            path = file.getPath();
+            name = file.getName();
+        }
+        return blRet;
+    }
 
-	public boolean mkdir() {
-		fileInterfaces = null;
-		list = null;
-		archive = false;
-		directory = true;
-		fileType = false;
-		return file.mkdir();
-	}
+    public boolean delete() {
+        return file.delete();
+    }
 
-	public boolean exists() {
-		return file.exists();
-	}
+    public boolean mkdir() {
+        fileInterfaces = null;
+        list = null;
+        archive = false;
+        directory = true;
+        fileType = false;
+        return file.mkdir();
+    }
 
-	public void logon() {
-		return;
-	}
+    public boolean exists() {
+        return file.exists();
+    }
 
-	public void logoff() {
-		return;
-	}
+    public void logon() {
+        return;
+    }
 
-	public boolean createNewFile() throws IOException {
-		return file.createNewFile();
-	}
+    public void logoff() {
+        return;
+    }
 
-	public void startTerminal() {
-		final JShellPanel sp = new JShellPanel(getFileInterfaceConfiguration()
-				.getAppName());
-		final JExDialog dlg = new JExDialog(null, "JShell - " + getId(), false,
-				getAppName());
-		dlg.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent event) {
-				Object object = event.getSource();
-				if (object == dlg) {
-					sp.stop();
-					super.windowClosing(event);
-					dlg.dispose();
-				}
-			}
-		});
-		dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dlg.getContentPane().add("Center", sp);
-		dlg.pack();
-		dlg.setVisible(true);
-		Thread th = new Thread() {
-			public void run() {
-				try {
-					StringBuffer strbufCmd = new StringBuffer("cd \"");
-					strbufCmd.append(getAbsolutePath());
-					strbufCmd.append("\"");
-					sp.getShell().getShellEnv().setFileInterface(duplicate());
-					JShellEngine.processCommands(strbufCmd.toString(), sp
-							.getShell().getShellEnv(), false);
-					sp.start();
-					dlg.setVisible(false);
-					dlg.dispose();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					dlg.setVisible(false);
-				}
-			}
-		};
-		th.start();
-	}
+    @Override
+    protected boolean createPysicallyNewFile() throws IOException {
+        return file.createNewFile();
+    }
 
-	/**
-	 * ececute command
-	 * 
-	 * @param strTargetPath
-	 *            traget path
-	 * @param cmd
-	 *            CommandClass
-	 */
-	public int exec(String strTargetPath, CommandClass cmd, OutputStream osOut,
-			OutputStream osErr, InputStream is) {
-		int iRet = -1;
-		try {
-			iRet = FileConnector.exec(this,
-					cmd.getCompleteCommand(this, strTargetPath), strTargetPath,
-					cmd, osOut, osErr, is);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		return iRet;
-	}
+    public void startTerminal() {
+        final JShellPanel sp = new JShellPanel(getFileInterfaceConfiguration().getAppName());
+        final JExDialog dlg = new JExDialog(null, "JShell - " + getId(), false, getAppName());
+        dlg.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent event) {
+                Object object = event.getSource();
+                if (object == dlg) {
+                    sp.stop();
+                    super.windowClosing(event);
+                    dlg.dispose();
+                }
+            }
+        });
+        dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dlg.getContentPane().add("Center", sp);
+        dlg.pack();
+        dlg.setVisible(true);
+        Thread th = new Thread() {
+            public void run() {
+                try {
+                    StringBuffer strbufCmd = new StringBuffer("cd \"");
+                    strbufCmd.append(getAbsolutePath());
+                    strbufCmd.append("\"");
+                    sp.getShell().getShellEnv().setFileInterface(duplicate());
+                    JShellEngine.processCommands(strbufCmd.toString(), sp.getShell().getShellEnv(), false);
+                    sp.start();
+                    dlg.setVisible(false);
+                    dlg.dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    dlg.setVisible(false);
+                }
+            }
+        };
+        th.start();
+    }
 
-	public Object getConnObj() {
-		return null;
-	}
+    /**
+     * ececute command
+     * 
+     * @param strTargetPath
+     *            traget path
+     * @param cmd
+     *            CommandClass
+     */
+    public int exec(String strTargetPath, CommandClass cmd, OutputStream osOut, OutputStream osErr, InputStream is) {
+        int iRet = -1;
+        try {
+            iRet = FileConnector.exec(this, cmd.getCompleteCommand(this, strTargetPath), strTargetPath, cmd, osOut, osErr, is);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return iRet;
+    }
 
-	public String extractToTempDir() {
-		return getParent();
-	}
+    public Object getConnObj() {
+        return null;
+    }
 
-	public void deleteOnExit() {
-		file.deleteOnExit();
-	}
+    public String extractToTempDir() {
+        return getParent();
+    }
 
-	public boolean setReadOnly() {
-		return file.setReadOnly();
-	}
+    public void deleteOnExit() {
+        file.deleteOnExit();
+    }
+
+    public boolean setReadOnly() {
+        return file.setReadOnly();
+    }
 }

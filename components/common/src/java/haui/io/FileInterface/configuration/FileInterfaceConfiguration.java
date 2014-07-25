@@ -13,60 +13,74 @@ package haui.io.FileInterface.configuration;
 import haui.util.AppProperties;
 
 /**
- * Module:      FileInterfaceConfiguration<br> <p> Description: FileInterfaceConfiguration<br> </p><p> Created:     16.03.2006 by Andreas Eisenhauer </p><p>
- * @history      16.03.2006 by AE: Created.<br>  </p><p>
- * @author       <a href="mailto:andreas.eisenhauer@haui.cjb.net">Andreas Eisenhauer</a>  </p><p>
- * @version      v0.1, 2006; %version: %<br>  </p><p>
- * @since        JDK1.4  </p>
+ * Module: FileInterfaceConfiguration<br>
+ * <p>
+ * Description: FileInterfaceConfiguration<br>
+ * </p>
+ * <p>
+ * Created: 16.03.2006 by Andreas Eisenhauer
+ * </p>
+ * <p>
+ * 
+ * @history 16.03.2006 by AE: Created.<br>
+ *          </p>
+ *          <p>
+ * @author <a href="mailto:andreas.eisenhauer@haui.cjb.net">Andreas
+ *         Eisenhauer</a>
+ *         </p>
+ *         <p>
+ * @version v0.1, 2006; %version: %<br>
+ *          </p>
+ *          <p>
+ * @since JDK1.4
+ *        </p>
  */
-public abstract class FileInterfaceConfiguration
-{
-  protected String m_strAppName;
-  protected AppProperties m_appProps;
-  
-  private boolean m_blLocal = true;
-  private boolean m_blCached = false;
+public abstract class FileInterfaceConfiguration {
+	protected String appName;
+	protected AppProperties appProps;
 
-  public FileInterfaceConfiguration( String appName, AppProperties props, boolean cached)
-  {
-    super();
-    m_strAppName = appName;
-    m_appProps = props;
-    m_blCached = cached;
-  }
+	private boolean local = true;
+	private boolean cached = false;
 
-  public AppProperties getAppProperties()
-  {
-    return m_appProps;
-  }
+	public FileInterfaceConfiguration(String appName, AppProperties props,
+			boolean cached) {
+		this(appName, props, true, cached);
+	}
 
-  public void setAppProperties( AppProperties props)
-  {
-    m_appProps = props;
-  }
+	public FileInterfaceConfiguration(String appName, AppProperties props,
+			boolean local, boolean cached) {
+		super();
+		this.appName = appName;
+		this.appProps = props;
+		this.local = local;
+		this.cached = cached;
+	}
 
-  public String getAppName()
-  {
-    return m_strAppName;
-  }
+	public AppProperties getAppProperties() {
+		return appProps;
+	}
 
-  public void setAppName( String appName)
-  {
-    m_strAppName = appName;
-  }
+	public void setAppProperties(AppProperties props) {
+		this.appProps = props;
+	}
 
-  public boolean isLocal()
-  {
-    return m_blLocal;
-  }
+	public String getAppName() {
+		return appName;
+	}
 
-  public boolean isCached()
-  {
-    return m_blCached;
-  }
+	public void setAppName(String appName) {
+		this.appName = appName;
+	}
 
-  public void setCached( boolean cached)
-  {
-    m_blCached = cached;
-  }
+	public boolean isLocal() {
+		return local;
+	}
+
+	public boolean isCached() {
+		return cached;
+	}
+
+	public void setCached(boolean cached) {
+		this.cached = cached;
+	}
 }
